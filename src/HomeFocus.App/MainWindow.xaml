@@ -1,4 +1,4 @@
-﻿<Window x:Class="HomeFocus.App.MainWindow"
+<Window x:Class="HomeFocus.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:HomeFocus.App.Localization"
@@ -21,6 +21,8 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
 
+    <!-- 1 px frame (Windows 10). On Windows 11 the system draws the border with rounded corners instead. -->
+    <Border x:Name="Frame" BorderBrush="{DynamicResource Brush.WindowBorder}" BorderThickness="1">
     <Grid x:Name="Root">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
@@ -107,4 +109,5 @@
             </StackPanel>
         </Grid>
     </Grid>
+    </Border>
 </Window>

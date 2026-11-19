@@ -6,6 +6,7 @@
     <SolidColorBrush x:Key="Brush.Card" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Brush.Subtle" Color="#F4F5F7"/>
     <SolidColorBrush x:Key="Brush.Border" Color="#E3E5EA"/>
+    <SolidColorBrush x:Key="Brush.WindowBorder" Color="#B4BAC5"/>
     <SolidColorBrush x:Key="Brush.BorderStrong" Color="#D5D9E0"/>
     <SolidColorBrush x:Key="Brush.Input" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Brush.Track" Color="#EEF0F3"/>
