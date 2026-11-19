@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>HomeFocus.App</RootNamespace>
+    <AssemblyName>HomeFocus</AssemblyName>
+    <Product>HomeFocus</Product>
+    <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF and WinForms share type names; only the NotifyIcon comes from WinForms (aliased as Forms). -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="..\..\assets\app.ico" Link="Assets\app.ico" />
+    <Resource Include="..\..\assets\icon-256.png" Link="Assets\icon-256.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HomeFocus.Core\HomeFocus.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,98 @@
+<Window x:Class="HomeFocus.App.Views.TrayPopup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:HomeFocus.App.Controls"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" ResizeMode="NoResize"
+        Width="380" SizeToContent="Height" ShowInTaskbar="False" Topmost="True"
+        FontFamily="{StaticResource Font.UI}" FontSize="13.5" Foreground="{DynamicResource Brush.Text}"
+        TextOptions.TextFormattingMode="Display" UseLayoutRounding="True" Title="HomeFocus">
+    <Window.Resources>
+        <Style x:Key="MenuButton" TargetType="Button" BasedOn="{StaticResource Button.Ghost}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="MinHeight" Value="40"/>
+        </Style>
+    </Window.Resources>
+    <Border Margin="10" Padding="16" CornerRadius="14" BorderThickness="1"
+            Background="{DynamicResource Brush.Card}" BorderBrush="{DynamicResource Brush.Border}" Effect="{StaticResource Shadow.Popup}">
+        <StackPanel>
+            <DockPanel>
+                <Border DockPanel.Dock="Right" CornerRadius="99" Padding="10,4" VerticalAlignment="Center" Background="{DynamicResource Brush.Subtle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="7" Height="7" VerticalAlignment="Center">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{DynamicResource Brush.Ok}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                            <Setter Property="Fill" Value="{DynamicResource Brush.Warn}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <TextBlock Text="{Binding PillText}" FontSize="12" FontWeight="SemiBold" Margin="6,0,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://application:,,,/Assets/icon-256.png" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="HomeFocus" FontWeight="SemiBold" FontSize="15" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+
+            <TextBlock Text="Dnes aktívne" Style="{StaticResource Text.Muted}" Margin="0,16,0,0"/>
+            <TextBlock Text="{Binding ActiveText}" Style="{StaticResource Text.Value}" FontSize="30"/>
+            <c:ProportionBar Items="{Binding Shares}" Height="8" Margin="0,10,0,10"/>
+            <ItemsControl ItemsSource="{Binding Categories}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="18"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="9" Height="9" CornerRadius="3" Background="{Binding Brush}" HorizontalAlignment="Left"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Time}" FontSize="13" FontWeight="SemiBold"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{Binding NowText}" Style="{StaticResource Text.Muted}" Margin="0,6,0,0" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+            <Border Height="1" Background="{DynamicResource Brush.Border}" Margin="-16,14,-16,8"/>
+
+            <Button Style="{StaticResource MenuButton}" Click="Open_Click">
+                <StackPanel Orientation="Horizontal">
+                    <c:IconView Data="{StaticResource Icon.Window}" Margin="0,0,12,0"/>
+                    <TextBlock Text="Otvoriť dashboard"/>
+                </StackPanel>
+            </Button>
+            <Grid Visibility="{Binding IsPaused, Converter={StaticResource InverseBoolToVis}}">
+                <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <c:IconView Data="{StaticResource Icon.Pause}" Margin="0,0,12,0"/>
+                    <TextBlock Text="Pozastaviť" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="15 min" Style="{StaticResource Button.Ghost}" Padding="10,0" Click="Pause_Click" x:Name="P15"/>
+                    <Button Content="30 min" Style="{StaticResource Button.Ghost}" Padding="10,0" Click="Pause_Click" x:Name="P30"/>
+                    <Button Content="1 h" Style="{StaticResource Button.Ghost}" Padding="10,0" Click="Pause_Click" x:Name="P60"/>
+                </StackPanel>
+            </Grid>
+            <Button Style="{StaticResource MenuButton}" Click="Resume_Click" Visibility="{Binding IsPaused, Converter={StaticResource BoolToVis}}">
+                <StackPanel Orientation="Horizontal">
+                    <c:IconView Data="{StaticResource Icon.Play}" Margin="0,0,12,0" Filled="True" StrokeThickness="1.5"/>
+                    <TextBlock Text="Pokračovať v sledovaní"/>
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MenuButton}" Click="Quit_Click" Foreground="{DynamicResource Brush.Muted}">
+                <StackPanel Orientation="Horizontal">
+                    <c:IconView Data="{StaticResource Icon.Power}" Margin="0,0,12,0"/>
+                    <TextBlock Text="Ukončiť HomeFocus"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Border>
+</Window>
