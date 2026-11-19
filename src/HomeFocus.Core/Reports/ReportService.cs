@@ -92,6 +92,14 @@ public sealed class ReportService(ActivityStore store, Func<Categorizer> categor
             var i = list.FindIndex(r => r.Id == cur.Id);
             if (i >= 0) list[i] = cur; else list.Add(cur);
         }
+        // Subdomains count as their site (also for history recorded before this rule existed).
+        var cat = categorizer();
+        for (var i = 0; i < list.Count; i++)
+        {
+            if (list[i].Kind != ActivityKind.Web) continue;
+            var site = cat.SiteFor(list[i].AppKey);
+            if (site != list[i].AppKey) list[i] = list[i] with { AppKey = site, DisplayName = site };
+        }
         return list;
     }
 

@@ -34,7 +34,7 @@ public sealed class AppServices : IDisposable
         ReloadLookups();
         Browser = new BrowserState();
         Pairing = new PairingTokens(Settings);
-        var tracker = new ActivityTracker(new Win32ForegroundSource(), Activities, DeviceId, Browser)
+        var tracker = new ActivityTracker(new Win32ForegroundSource(), Activities, DeviceId, Browser, host => Categorizer.SiteFor(host))
         {
             IdleThreshold = TimeSpan.FromMinutes(Settings.GetInt(SettingKeys.IdleMinutes, 3)),
         };

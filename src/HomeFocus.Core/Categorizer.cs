@@ -27,6 +27,14 @@ public sealed class Categorizer
 
     public long FallbackCategoryId { get; }
 
+    /// <summary>Website rule patterns, used to keep explicitly ruled subdomains apart (see <see cref="Browser.SiteKey"/>).</summary>
+    public IReadOnlyList<string> WebPatterns => _webs.Select(w => w.Rule.Pattern).ToList();
+
+    /// <summary>The key a host is recorded and reported under.</summary>
+    public string SiteFor(string host) => Browser.SiteKey.For(host, _webPatterns ??= WebPatterns);
+
+    private IReadOnlyList<string>? _webPatterns;
+
     public long Resolve(string appKey) => TryMatch(appKey) ?? FallbackCategoryId;
 
     public long Resolve(ActivityKind kind, string key) => TryMatch(kind, key) ?? FallbackCategoryId;

@@ -27,7 +27,8 @@ public interface IBrowserActivity
 /// is never an "app" then, and pages without a website (new tab, settings) are not counted.
 /// Call <see cref="Tick"/> about once a second; it is not thread-safe.
 /// </summary>
-public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink, string deviceId, IBrowserActivity? browser = null)
+public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink, string deviceId, IBrowserActivity? browser = null,
+    Func<string, string>? siteKey = null)
 {
     /// <summary>Segments shorter than this are dropped (alt-tab flicker).</summary>
     public static readonly TimeSpan MinSegment = TimeSpan.FromSeconds(2);
@@ -96,7 +97,7 @@ public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink
                 return;
             }
             kind = ActivityKind.Web;
-            key = name = domain;
+            key = name = siteKey?.Invoke(domain) ?? domain;
         }
 
         if (_current is { } cur && cur.Kind == kind && string.Equals(cur.AppKey, key, StringComparison.OrdinalIgnoreCase))

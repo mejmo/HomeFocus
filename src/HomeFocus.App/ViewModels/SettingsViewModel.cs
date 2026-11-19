@@ -171,7 +171,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         }
         AiBusy = true;
         AiStatus = Loc.T("ai.running");
-        try { await ai.RunAsync(); }
+        try { await ai.RunAsync(manual: true); }
         finally { AiBusy = false; }
     }
 

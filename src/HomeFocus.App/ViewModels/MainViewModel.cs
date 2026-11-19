@@ -20,7 +20,8 @@ public sealed partial class MainViewModel : ObservableObject
         Settings = new SettingsViewModel();
         _current = Today;
         _status.Tick += (_, _) => OnTick();
-        AppServices.Instance.LookupsChanged += (_, _) => { if (CurrentPage != Rules) CurrentPage.Refresh(); };
+        // Settings is skipped so a background AI run never resets what you are typing there.
+        AppServices.Instance.LookupsChanged += (_, _) => { if (CurrentPage != Settings) CurrentPage.Refresh(); };
     }
 
     public TodayViewModel Today { get; }
