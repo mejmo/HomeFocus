@@ -128,10 +128,9 @@
                                             <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" MaxWidth="260" ToolTip="{Binding AppKey}"/>
                                             <TextBlock Text="{l:T rules.kindWeb}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
                                                        Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"/>
-                                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                <Ellipse Width="7" Height="7" Fill="{Binding Brush}" VerticalAlignment="Center"/>
-                                                <TextBlock Text="{Binding Category}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="5,0,0,0" VerticalAlignment="Center"/>
-                                            </StackPanel>
+                                            <Border Style="{StaticResource Chip}" Background="{Binding Tint}" Margin="8,0,0,0">
+                                                <TextBlock Text="{Binding Category}" Foreground="{Binding TextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                                            </Border>
                                         </StackPanel>
                                         <ProgressBar Style="{StaticResource Progress.Thin}" Value="{Binding Fraction, Mode=OneWay}" Foreground="{Binding Brush}" Margin="0,7,0,0"/>
                                     </StackPanel>

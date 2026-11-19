@@ -134,10 +134,9 @@
                                             <TextBlock Text="{l:T rules.kindWeb}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
                                                        Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Ellipse Width="8" Height="8" Fill="{Binding Brush}" VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding Category}" Foreground="{DynamicResource Brush.TextSecondary}" FontSize="12.5" Margin="7,0,0,0" VerticalAlignment="Center"/>
-                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{Binding Tint}" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding Category}" Foreground="{Binding TextBrush}" FontSize="11.5" FontWeight="SemiBold"/>
+                                        </Border>
                                         <TextBlock Grid.Column="3" Text="{Binding Time}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                                         <TextBlock Grid.Column="4" Text="{Binding Share}" Foreground="{DynamicResource Brush.Muted}" HorizontalAlignment="Right"/>
                                     </Grid>

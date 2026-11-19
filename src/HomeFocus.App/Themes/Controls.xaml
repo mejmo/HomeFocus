@@ -575,8 +575,8 @@
 
     <!-- Small rounded tag, e.g. a category chip -->
     <Style x:Key="Chip" TargetType="Border">
-        <Setter Property="CornerRadius" Value="99"/>
-        <Setter Property="Padding" Value="8,2"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="7,2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 </ResourceDictionary>
