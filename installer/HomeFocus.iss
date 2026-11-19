@@ -7,9 +7,9 @@
 #ifndef AppPublisher
   #define AppPublisher "HomeFocus"
 #endif
-; Chrome Web Store ID of the HomeFocus extension (same as ExtensionInfo.StoreId). Empty = not offered yet.
+; Chrome Web Store ID of the HomeFocus extension (same as ExtensionInfo.StoreId). Empty = not offered.
 #ifndef ExtensionStoreId
-  #define ExtensionStoreId ""
+  #define ExtensionStoreId "hgibjbcmbjphclgadjlagjeioaanochk"
 #endif
 #ifndef PublishDir
   #define PublishDir "..\publish"

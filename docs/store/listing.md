@@ -54,7 +54,6 @@ Certify all three statements:
 - ☑ I do not use or transfer user data for purposes that are unrelated to my item's single purpose
 - ☑ I do not use or transfer user data to determine creditworthiness or for lending purposes
 
-## After publishing
+## Item
 
-Send the item ID (32 letters, from the store URL) so it can be set in
-`src/HomeFocus.App/Services/ExtensionInfo.cs` (`StoreId`) and `installer/HomeFocus.iss` (`ExtensionStoreId`).
+Store ID: `hgibjbcmbjphclgadjlagjeioaanochk` (set in `ExtensionInfo.StoreId` and `installer/HomeFocus.iss`).
