@@ -21,6 +21,13 @@ HomeFocus quietly tracks where your time goes on your Windows PC, so you can see
 
 ![HomeFocus – today: day timeline, top apps and websites, categories](docs/images/app-today.png)
 
+## Highlights
+
+- **No cloud**: all data stays on your computer.
+- **Local AI categories**: a local [Ollama](https://ollama.com) model sorts apps and websites based on your job title.
+- **Chrome extension**: tracks time per website.
+- **Android app** (coming soon): syncs your phone usage to your PC over your home network.
+
 ## Why HomeFocus
 
 Working from home blurs the line between work and everything else. HomeFocus shows you, honestly and without judgement, how your day really went: how much was deep work, how much was chat, and when the breaks got long.
