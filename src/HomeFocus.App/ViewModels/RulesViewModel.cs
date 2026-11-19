@@ -76,11 +76,13 @@ public sealed partial class RulesViewModel : PageViewModel
 
     partial void OnSearchChanged(string value) => LoadRules();
 
+    private List<Rule> _allRules = [];
+
     public override void Refresh()
     {
         _suppress = true;
         var s = AppServices.Instance;
-        var rules = s.Rules.GetAll();
+        var rules = _allRules = s.Rules.GetAll();
         var rows = new List<CategoryFilterRow>
         {
             new(this, null, Loc.T("rules.all"), (Brush)System.Windows.Application.Current.FindResource("Brush.Text"), rules.Count),
@@ -103,7 +105,7 @@ public sealed partial class RulesViewModel : PageViewModel
         _suppress = true;
         var s = AppServices.Instance;
         var q = Search.Trim();
-        Rules = s.Rules.GetAll()
+        Rules = _allRules
             .Where(r => _selected is null || r.CategoryId == _selected)
             .Where(r => q.Length == 0 || r.Pattern.Contains(q, StringComparison.OrdinalIgnoreCase))
             .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser, r.Kind)).ToList();
@@ -123,8 +125,12 @@ public sealed partial class RulesViewModel : PageViewModel
     {
         if (_suppress) return;
         AppServices.Instance.Rules.Set(pattern, category.Id, kind);
-        AppServices.Instance.ReloadLookups();
-        Refresh();
+        // Rebuild after the combo box that triggered this has closed, so the click feels instant.
+        System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            AppServices.Instance.ReloadLookups();
+            Refresh();
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
 
     internal void DeleteRule(RuleRow row)
