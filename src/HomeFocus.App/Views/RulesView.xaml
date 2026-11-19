@@ -202,6 +202,7 @@
                                                 <TextBlock Text="{Binding Pattern}" FontFamily="Cascadia Mono, Consolas" FontSize="12.5"/>
                                             </Border>
                                             <TextBlock Text="{Binding KindText}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Usage}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
                                         </StackPanel>
                                         <Button Grid.Column="1" Margin="0,0,16,0" HorizontalContentAlignment="Stretch" Padding="12,0,10,0"
                                                 Background="{DynamicResource Brush.Input}" Click="CategoryButton_Click"
@@ -225,6 +226,8 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    <Button Content="{Binding ShowAllText}" Command="{Binding ToggleShowAllCommand}" HorizontalAlignment="Left" Margin="0,12,0,0"
+                            Visibility="{Binding CanShowMore, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Style="{StaticResource Text.Muted}" Margin="0,14,0,0"
                                Text="{l:T rules.footer}"/>
                 </StackPanel>

@@ -23,8 +23,11 @@ public sealed partial class CategoryFilterRow(RulesViewModel owner, CategoryInfo
     [RelayCommand] private void Delete() => owner.DeleteCategory(this);
 }
 
-public sealed partial class RuleRow(RulesViewModel owner, long id, string pattern, CategoryInfo category, bool isUser, ActivityKind kind) : ObservableObject
+public sealed partial class RuleRow(RulesViewModel owner, long id, string pattern, CategoryInfo category, bool isUser, ActivityKind kind,
+    string usage = "") : ObservableObject
 {
+    /// <summary>Time spent in the last 30 days in apps/websites this rule matches ("" when none).</summary>
+    public string Usage { get; } = usage;
     public long Id { get; } = id;
     public string Pattern { get; } = pattern;
     public ActivityKind Kind { get; } = kind;
@@ -67,10 +70,16 @@ public sealed partial class RulesViewModel : PageViewModel
     [ObservableProperty] private string _newCategoryName = "";
     [ObservableProperty] private string _newCategoryColor = Palette[5];
     [ObservableProperty] private bool _isAddingCategory;
+    [ObservableProperty] private bool _showAll;
+    [ObservableProperty] private string _showAllText = "";
+    [ObservableProperty] private bool _canShowMore;
+
+    /// <summary>Rules shown before "Show all": the most used ones.</summary>
+    private const int TopCount = 5;
 
     private long? _selected;
-    private bool _hasSelection;
     private bool _suppress;
+    private Dictionary<long, TimeSpan> _usage = new();
 
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
     public IReadOnlyList<string> Colors => Palette;
@@ -84,13 +93,8 @@ public sealed partial class RulesViewModel : PageViewModel
         _suppress = true;
         var s = AppServices.Instance;
         var rules = _allRules = s.Rules.GetAll();
-        // Start on the first category rather than "All" (~100 rows make the page slow to show and scroll).
-        if (!_hasSelection)
-        {
-            _selected = s.CategoryList.FirstOrDefault()?.Id;
-            _hasSelection = true;
-        }
-        if (_selected is { } sel && s.CategoryList.All(c => c.Id != sel)) _selected = s.CategoryList.FirstOrDefault()?.Id;
+        if (_selected is { } sel && s.CategoryList.All(c => c.Id != sel)) _selected = null;
+        _usage = Usage(rules);
         var rows = new List<CategoryFilterRow>
         {
             new(this, null, Loc.T("rules.all"), (Brush)System.Windows.Application.Current.FindResource("Brush.Text"), rules.Count),
@@ -113,17 +117,59 @@ public sealed partial class RulesViewModel : PageViewModel
         _suppress = true;
         var s = AppServices.Instance;
         var q = Search.Trim();
-        Rules = _allRules
+        var matching = _allRules
             .Where(r => _selected is null || r.CategoryId == _selected)
             .Where(r => q.Length == 0 || r.Pattern.Contains(q, StringComparison.OrdinalIgnoreCase))
-            .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser, r.Kind)).ToList();
+            // most used first, then your own rules, then alphabetical
+            .OrderByDescending(r => _usage.GetValueOrDefault(r.Id))
+            .ThenByDescending(r => r.IsUser)
+            .ThenBy(r => r.Pattern, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        // A search shows every match; otherwise only the top few until "Show all".
+        var limit = ShowAll || q.Length > 0 ? matching.Count : TopCount;
+        Rules = matching.Take(limit)
+            .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser, r.Kind,
+                _usage.TryGetValue(r.Id, out var u) && u >= TimeSpan.FromMinutes(1) ? Loc.F("rules.usage", Format.Duration(u)) : ""))
+            .ToList();
+        CanShowMore = q.Length == 0 && matching.Count > TopCount;
+        ShowAllText = ShowAll ? Loc.T("rules.showFewer") : Loc.F("rules.showAll", matching.Count);
         RulesTitle = Loc.F("rules.rulesFor", _selected is { } id ? s.Category(id).Name : Loc.T("rules.all"));
         _suppress = false;
+    }
+
+    [RelayCommand]
+    private void ToggleShowAll()
+    {
+        ShowAll = !ShowAll;
+        LoadRules();
+    }
+
+    /// <summary>Time per rule over the last 30 days: apps/websites whose key the rule's pattern matches.</summary>
+    private static Dictionary<long, TimeSpan> Usage(List<Rule> rules)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var apps = AppServices.Instance.Reports.GetRange(today.AddDays(-29), today.AddDays(1)).Apps;
+        var result = new Dictionary<long, TimeSpan>();
+        foreach (var r in rules)
+        {
+            var total = TimeSpan.Zero;
+            foreach (var a in apps)
+            {
+                if (a.Kind != r.Kind && !(a.Kind == ActivityKind.App && r.Kind == ActivityKind.App)) continue;
+                var hit = r.Kind == ActivityKind.Web && !r.Pattern.Contains('*')
+                    ? Categorizer.DomainMatches(r.Pattern, a.AppKey)
+                    : Categorizer.Matches(r.Pattern, a.AppKey);
+                if (hit) total += a.Duration;
+            }
+            if (total > TimeSpan.Zero) result[r.Id] = total;
+        }
+        return result;
     }
 
     internal void Select(CategoryFilterRow row)
     {
         if (_suppress) return;
+        ShowAll = false;
         _selected = row.Category?.Id;
         foreach (var r in CategoryRows) if (r != row) r.IsSelected = false;
         LoadRules();

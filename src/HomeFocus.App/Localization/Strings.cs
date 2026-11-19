@@ -192,6 +192,9 @@ public static class Strings
         ["settings.extDisconnectText"] = ("Every browser will have to be approved again the next time its extension connects.",
             "Každý prehliadač bude treba znova schváliť, keď sa jeho rozšírenie nabudúce pripojí."),
         ["rules.kindApp"] = ("app", "aplikácia"),
+        ["rules.showAll"] = ("Show all ({0})", "Zobraziť všetky ({0})"),
+        ["rules.showFewer"] = ("Show fewer", "Zobraziť menej"),
+        ["rules.usage"] = ("· {0} in 30 days", "· {0} za 30 dní"),
         ["rules.kindWeb"] = ("website", "web"),
 
         // Tray
