@@ -1,0 +1,14 @@
+{
+  "extName": { "message": "HomeFocus" },
+  "extDescription": { "message": "Oznamuje aplikácii HomeFocus v tomto počítači, ktorá webová stránka je v aktívnej karte. Nikam inam sa nič neposiela." },
+  "connectedTitle": { "message": "Pripojené" },
+  "connectedText": { "message": "Weby v aktívnej karte sa započítavajú v HomeFocus." },
+  "waitingTitle": { "message": "Čaká sa na schválenie" },
+  "waitingText": { "message": "Potvrď pripojenie v okne HomeFocus vo svojom počítači." },
+  "deniedTitle": { "message": "Pripojenie odmietnuté" },
+  "deniedText": { "message": "HomeFocus tento prehliadač odmietol. Znova sa môžeš opýtať o pár minút." },
+  "offlineTitle": { "message": "HomeFocus nebeží" },
+  "offlineText": { "message": "Spusti HomeFocus v tomto počítači, rozšírenie sa pripojí samo." },
+  "retry": { "message": "Skúsiť znova" },
+  "footer": { "message": "Do aplikácie HomeFocus v tomto počítači ide len doména webu. Nič sa neposiela do internetu." }
+}

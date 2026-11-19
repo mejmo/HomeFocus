@@ -23,7 +23,7 @@ HomeFocus quietly tracks where your time goes on your Windows PC, so you can see
 
 Working from home blurs the line between work and everything else. HomeFocus shows you, honestly and without judgement, how your day really went: how much was deep work, how much was chat, and when the breaks got long.
 
-It is **fully self-hosted**. Everything runs and stays on your own computer, and **nothing is ever sent to the cloud**: no account, no telemetry, no server. Your history lives in a single local file you own.
+It is **fully self-hosted**. Everything runs and stays on your own computer, and **nothing is ever sent to the cloud**: no account, no telemetry, no server, no internet connection at all. The only connection is a local one on `127.0.0.1` for the optional browser extension. Your history lives in a single local file you own.
 
 ## Features
 

@@ -1,0 +1,14 @@
+{
+  "extName": { "message": "HomeFocus" },
+  "extDescription": { "message": "Tells the HomeFocus app on this PC which website is in your active tab. Nothing is sent anywhere else." },
+  "connectedTitle": { "message": "Connected" },
+  "connectedText": { "message": "Websites in your active tab are counted in HomeFocus." },
+  "waitingTitle": { "message": "Waiting for approval" },
+  "waitingText": { "message": "Confirm the connection in the HomeFocus window on your PC." },
+  "deniedTitle": { "message": "Connection declined" },
+  "deniedText": { "message": "HomeFocus declined this browser. You can ask again in a few minutes." },
+  "offlineTitle": { "message": "HomeFocus is not running" },
+  "offlineText": { "message": "Start HomeFocus on this PC; the extension connects by itself." },
+  "retry": { "message": "Try again" },
+  "footer": { "message": "Only the website's domain goes to the HomeFocus app on this PC. Nothing is sent to the internet." }
+}

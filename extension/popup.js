@@ -1,16 +1,21 @@
+const t = (key) => chrome.i18n.getMessage(key);
 const STATES = {
-  connected: ['var(--ok)', 'Connected', 'Websites in your active tab are counted in HomeFocus.'],
-  waiting: ['var(--warn)', 'Waiting for approval', 'Confirm the connection in the HomeFocus window on your PC.'],
-  denied: ['var(--bad)', 'Connection declined', 'HomeFocus declined this browser. You can ask again in a few minutes.'],
-  offline: ['var(--muted)', 'HomeFocus is not running', 'Start HomeFocus on this PC; the extension connects by itself.'],
+  connected: ['var(--ok)', 'connected'],
+  waiting: ['var(--warn)', 'waiting'],
+  denied: ['var(--bad)', 'denied'],
+  offline: ['var(--muted)', 'offline'],
 };
+
+document.documentElement.lang = chrome.i18n.getUILanguage().startsWith('sk') ? 'sk' : 'en';
+document.getElementById('retry').textContent = t('retry');
+document.getElementById('footer').textContent = t('footer');
 
 async function render() {
   const { status = 'offline' } = await chrome.storage.session.get('status');
-  const [color, title, text] = STATES[status] ?? STATES.offline;
+  const [color, key] = STATES[status] ?? STATES.offline;
   document.getElementById('dot').style.background = color;
-  document.getElementById('title').textContent = title;
-  document.getElementById('text').textContent = text;
+  document.getElementById('title').textContent = t(key + 'Title');
+  document.getElementById('text').textContent = t(key + 'Text');
   document.getElementById('retry').hidden = status === 'connected' || status === 'waiting';
 }
 
