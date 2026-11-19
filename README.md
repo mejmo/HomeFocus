@@ -10,29 +10,38 @@
   <a href="https://github.com/mejmo/HomeFocus/actions/workflows/release.yml"><img src="https://github.com/mejmo/HomeFocus/actions/workflows/release.yml/badge.svg" alt="Release"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&amp;logoColor=white" alt="Windows 10 | 11">
   <img src="https://img.shields.io/badge/.NET-9-512BD4?logo=dotnet&amp;logoColor=white" alt=".NET 9">
-  <img src="https://img.shields.io/badge/WPF-desktop-2F5BEA" alt="WPF">
-  <img src="https://img.shields.io/badge/d%C3%A1ta-100%25%20lok%C3%A1lne-16A34A" alt="dáta 100 % lokálne">
+  <img src="https://img.shields.io/badge/self--hosted-100%25%20local-16A34A" alt="self-hosted, 100 % local">
+  <img src="https://img.shields.io/badge/cloud-none-16A34A" alt="no cloud">
 </p>
 
-<p align="center">Desktopová aplikácia pre Windows, ktorá automaticky sleduje, koľko času trávite v jednotlivých aplikáciách. Všetky dáta ostávajú v počítači a do cloudu sa nič neposiela.</p>
+<p align="center"><b>Stay in focus while you work from home.</b><br>
+HomeFocus quietly tracks where your time goes on your Windows PC, so you can see when work turns into scrolling.</p>
 
-![HomeFocus – týždenný prehľad podľa kategórií a rebríček aplikácií](docs/images/screenshot.png)
+![HomeFocus – weekly overview by category and app ranking](docs/images/screenshot.png)
 
-- **Sledovanie** aktívneho okna každú sekundu, s rozpoznaním nečinnosti (prah sa dá nastaviť), pauzy a uspania PC
-- **Dashboard**: časová os dňa, top aplikácie, kategórie, týždenný a mesačný prehľad, export do CSV
-- **Kategórie a pravidlá**: automatické zaradenie podľa procesu (`devenv.exe`, `steam*.exe`). Vlastné pravidlá platia aj pre už zaznamenanú históriu.
-- **Systray**: rýchly prehľad dňa, pauza, autostart pri prihlásení
-- Svetlý aj tmavý vzhľad podľa Windows
+## Why HomeFocus
 
-Dáta: `%APPDATA%\HomeFocus\data.db` (SQLite).
+Working from home blurs the line between work and everything else. HomeFocus shows you, honestly and without judgement, how your day really went: how much was deep work, how much was chat, and when the breaks got long.
 
-## Inštalácia
+It is **fully self-hosted**. Everything runs and stays on your own computer, and **nothing is ever sent to the cloud**: no account, no telemetry, no server. Your history lives in a single local file you own.
 
-Stiahnite si `HomeFocus-Setup-x.y.z.exe` z [Releases](../../releases). Inštalátor nepotrebuje administrátorské práva a aplikáciu nainštaluje do `%LOCALAPPDATA%\Programs\HomeFocus`. .NET netreba inštalovať samostatne, je súčasťou aplikácie. Pri odinštalovaní dáta v `%APPDATA%\HomeFocus` ostanú.
+## Features
 
-## Vývoj
+- **Automatic tracking** of the active app, once a second, with idle detection (adjustable), pause and sleep handling
+- **Dashboard**: day timeline, top apps, categories, weekly and monthly overview, CSV export
+- **Categories & rules**: apps are sorted by process name (`devenv.exe`, `steam*.exe`); your own rules also apply to past history
+- **Tray icon**: today at a glance, pause, starts quietly with Windows
+- Light and dark theme following Windows; English and Slovak UI
 
-Potrebné je .NET 9 SDK a Windows 10 alebo novší.
+Data: `%LOCALAPPDATA%\HomeFocus\data.db` (SQLite).
+
+## Install
+
+Download `HomeFocus-Setup-x.y.z.exe` from [Releases](../../releases). The installer is signed, needs no admin rights and installs to `%LOCALAPPDATA%\Programs\HomeFocus`; .NET is bundled. HomeFocus then starts with Windows straight into the tray. Uninstalling keeps your data in `%LOCALAPPDATA%\HomeFocus`.
+
+## Development
+
+Requires the .NET 9 SDK on Windows 10 or later.
 
 ```powershell
 dotnet build
@@ -40,11 +49,11 @@ dotnet test
 dotnet run --project src/HomeFocus.App
 ```
 
-Premenná `HOMEFOCUS_DB` presmeruje aplikáciu na inú databázu, napríklad na skúšanie. Debug build nikdy nezapisuje autostart do registrov.
+In Debug builds `HOMEFOCUS_DB` points the app at another database; `HOMEFOCUS_LANG=en|sk` forces the UI language. Debug builds never write the autostart entry.
 
-| Priečinok | Obsah |
+| Folder | Contents |
 |---|---|
-| `src/HomeFocus.Core` | databáza, pravidlá, sledovanie (Win32), reporty |
-| `src/HomeFocus.App` | WPF UI: `Themes/` (vlastné štýly), `Views/`, `ViewModels/`, `Controls/` (grafy) |
-| `tests/HomeFocus.Tests` | xUnit testy jadra |
-| `installer/HomeFocus.iss` | inštalátor (Inno Setup 6) |
+| `src/HomeFocus.Core` | database, rules, tracking (Win32), reports |
+| `src/HomeFocus.App` | WPF UI: `Themes/` (custom styles), `Views/`, `ViewModels/`, `Controls/` (charts), `Localization/` |
+| `tests/HomeFocus.Tests` | xUnit tests for the core |
+| `installer/` | Inno Setup installer |

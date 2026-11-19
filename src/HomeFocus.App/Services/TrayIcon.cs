@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Views;
 using Forms = System.Windows.Forms;
 
@@ -51,8 +52,8 @@ public sealed class TrayIcon : IDisposable
         try
         {
             var d = AppServices.Instance.Reports.GetDay(DateOnly.FromDateTime(DateTime.Now));
-            var t = $"HomeFocus · dnes {Format.Duration(d.Active)}";
-            if (AppServices.Instance.Tracking.IsPaused) t += " · pozastavené";
+            var t = Loc.F("tray.tooltip", Format.Duration(d.Active));
+            if (AppServices.Instance.Tracking.IsPaused) t += Loc.T("tray.tooltipPaused");
             _icon.Text = t.Length > 63 ? t[..63] : t;
         }
         catch (Exception ex)

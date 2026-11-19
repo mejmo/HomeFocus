@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HomeFocus.App.Controls;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 
 namespace HomeFocus.App.ViewModels;
@@ -71,7 +72,7 @@ public sealed partial class ReportViewModel : PageViewModel
         var s = AppServices.Instance;
         _loading = true;
         var keep = Filter?.Value;
-        Filters = new[] { new Option<long?>("Všetky kategórie", null) }
+        Filters = new[] { new Option<long?>(Loc.T("report.allCategories"), null) }
             .Concat(s.CategoryList.Select(c => new Option<long?>(c.Name, c.Id))).ToList();
         Filter = Filters.FirstOrDefault(f => f.Value == keep) ?? Filters[0];
         _loading = false;
@@ -80,24 +81,24 @@ public sealed partial class ReportViewModel : PageViewModel
         var r = s.Reports.GetRange(from, to, Filter?.Value);
         CanGoNext = to <= Today;
         RangeText = IsWeek
-            ? $"{from.ToString("d. MMMM", Format.Sk)} – {to.AddDays(-1).ToString("d. MMMM yyyy", Format.Sk)}"
-            : Format.Capitalize(from.ToString("MMMM yyyy", Format.Sk));
+            ? $"{from.ToString(Loc.T("fmt.weekStart"), Loc.Culture)} – {to.AddDays(-1).ToString(Loc.T("fmt.weekEnd"), Loc.Culture)}"
+            : Format.Capitalize(from.ToString("MMMM yyyy", Loc.Culture));
 
         var activeDays = r.Days.Count(d => d.Total > TimeSpan.Zero);
         TotalText = Format.Duration(r.Active);
         AvgText = activeDays > 0 ? Format.Duration(r.Active / activeDays) : "—";
         var best = r.Days.OrderByDescending(d => d.Total).FirstOrDefault();
-        BestText = best is { } b && b.Total > TimeSpan.Zero ? Format.Capitalize(b.Day.ToString(IsWeek ? "dddd" : "d. MMMM", Format.Sk)) : "—";
+        BestText = best is { } b && b.Total > TimeSpan.Zero ? Format.Capitalize(b.Day.ToString(IsWeek ? "dddd" : Loc.T("fmt.bestMonth"), Loc.Culture)) : "—";
         BestSub = best is { } bb && bb.Total > TimeSpan.Zero ? Format.Duration(bb.Total) : "";
-        AppCountText = r.Apps.Count.ToString(Format.Sk);
+        AppCountText = r.Apps.Count.ToString(Loc.Culture);
 
         Bars = r.Days.Select(d =>
         {
-            var label = IsWeek ? Format.Capitalize(d.Day.ToString("ddd d.", Format.Sk)) : d.Day.Day.ToString(Format.Sk);
+            var label = IsWeek ? Format.Capitalize(d.Day.ToString(Loc.T("fmt.barWeek"), Loc.Culture)) : d.Day.Day.ToString(Loc.Culture);
             var parts = s.CategoryList
                 .Select(c => new BarPart(c.Brush, d.Categories.FirstOrDefault(x => x.CategoryId == c.Id)?.Duration.TotalMinutes ?? 0))
                 .Where(p => p.Minutes > 0).ToList();
-            var tip = $"{Format.Capitalize(d.Day.ToString("dddd d. M.", Format.Sk))} · {Format.Duration(d.Total)}";
+            var tip = $"{Format.Capitalize(d.Day.ToString(Loc.T("fmt.tip"), Loc.Culture))} · {Format.Duration(d.Total)}";
             return new BarItem(label, parts, tip);
         }).ToList();
 

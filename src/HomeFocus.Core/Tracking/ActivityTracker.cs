@@ -62,7 +62,7 @@ public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink
                 if (idleStart < _current.StartUtc) idleStart = _current.StartUtc;
                 Close(idleStart);
             }
-            Start(ActivityKind.Idle, "idle", "Nečinnosť", idleStart, nowUtc);
+            Start(ActivityKind.Idle, "idle", "Idle", idleStart, nowUtc);
             return;
         }
 

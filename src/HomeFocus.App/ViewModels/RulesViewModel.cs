@@ -1,6 +1,7 @@
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 using HomeFocus.App.Views;
 
@@ -25,7 +26,7 @@ public sealed partial class RuleRow(RulesViewModel owner, long id, string patter
 {
     public long Id { get; } = id;
     public string Pattern { get; } = pattern;
-    public string Source => isUser ? "Vlastné" : "Predvolené";
+    public string Source => Loc.T(isUser ? "rules.user" : "rules.default");
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
 
     [ObservableProperty] private CategoryInfo _category = category;
@@ -56,7 +57,7 @@ public sealed partial class RulesViewModel : PageViewModel
     [ObservableProperty] private IReadOnlyList<RuleRow> _rules = [];
     [ObservableProperty] private IReadOnlyList<UncategorizedRow> _uncategorized = [];
     [ObservableProperty] private string _search = "";
-    [ObservableProperty] private string _rulesTitle = "Pravidlá";
+    [ObservableProperty] private string _rulesTitle = "";
     [ObservableProperty] private string _newPattern = "";
     [ObservableProperty] private CategoryInfo? _newPatternCategory;
     [ObservableProperty] private string _newCategoryName = "";
@@ -78,7 +79,7 @@ public sealed partial class RulesViewModel : PageViewModel
         var rules = s.Rules.GetAll();
         var rows = new List<CategoryFilterRow>
         {
-            new(this, null, "Všetky", (Brush)System.Windows.Application.Current.FindResource("Brush.Text"), rules.Count),
+            new(this, null, Loc.T("rules.all"), (Brush)System.Windows.Application.Current.FindResource("Brush.Text"), rules.Count),
         };
         rows.AddRange(s.CategoryList.Select(c => new CategoryFilterRow(this, c, c.Name, c.Brush, rules.Count(r => r.CategoryId == c.Id))));
         foreach (var r in rows) r.IsSelected = r.Category?.Id == _selected;
@@ -88,7 +89,7 @@ public sealed partial class RulesViewModel : PageViewModel
 
         var today = DateOnly.FromDateTime(DateTime.Now);
         Uncategorized = s.Reports.GetUncategorized(today.AddDays(-6), today.AddDays(1))
-            .Take(8).Select(a => new UncategorizedRow(this, a.AppKey, a.DisplayName, Format.Duration(a.Duration) + " za 7 dní")).ToList();
+            .Take(8).Select(a => new UncategorizedRow(this, a.AppKey, a.DisplayName, Loc.F("rules.last7", Format.Duration(a.Duration)))).ToList();
         _suppress = false;
         LoadRules();
     }
@@ -102,7 +103,7 @@ public sealed partial class RulesViewModel : PageViewModel
             .Where(r => _selected is null || r.CategoryId == _selected)
             .Where(r => q.Length == 0 || r.Pattern.Contains(q, StringComparison.OrdinalIgnoreCase))
             .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser)).ToList();
-        RulesTitle = _selected is { } id ? $"Pravidlá · {s.Category(id).Name}" : "Pravidlá · Všetky";
+        RulesTitle = Loc.F("rules.rulesFor", _selected is { } id ? s.Category(id).Name : Loc.T("rules.all"));
         _suppress = false;
     }
 
@@ -133,8 +134,8 @@ public sealed partial class RulesViewModel : PageViewModel
     {
         if (row.Category is not { IsBuiltIn: false } c) return;
         var s = AppServices.Instance;
-        if (!MessageDialog.Show($"Odstrániť kategóriu {c.Name}?",
-                $"Jej pravidlá ({row.Count}) sa presunú do kategórie {s.Category(s.FallbackCategoryId).Name}.", "Odstrániť", "Zrušiť", danger: true))
+        if (!MessageDialog.Show(Loc.F("rules.deleteTitle", c.Name),
+                Loc.F("rules.deleteText", row.Count, s.Category(s.FallbackCategoryId).Name), Loc.T("common.delete"), Loc.T("common.cancel"), danger: true))
             return;
         s.Categories.Delete(c.Id, s.FallbackCategoryId);
         if (_selected == c.Id) _selected = null;

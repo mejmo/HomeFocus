@@ -1,6 +1,7 @@
 <UserControl x:Class="HomeFocus.App.Views.TodayView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:HomeFocus.App.Localization"
              xmlns:c="clr-namespace:HomeFocus.App.Controls">
     <StackPanel>
         <!-- Header -->
@@ -11,12 +12,12 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Button Style="{StaticResource Button.Icon}" BorderBrush="{DynamicResource Brush.BorderStrong}" Background="{DynamicResource Brush.Card}"
-                        Command="{Binding PrevDayCommand}" ToolTip="Predchádzajúci deň" AutomationProperties.Name="Predchádzajúci deň">
+                        Command="{Binding PrevDayCommand}" ToolTip="{l:T today.prev}" AutomationProperties.Name="{l:T today.prev}">
                     <c:IconView Data="{StaticResource Icon.ChevronLeft}" Width="16" Height="16"/>
                 </Button>
-                <Button Content="Dnes" Margin="8,0" Command="{Binding GoTodayCommand}"/>
+                <Button Content="{l:T today.goToday}" Margin="8,0" Command="{Binding GoTodayCommand}"/>
                 <Button Style="{StaticResource Button.Icon}" BorderBrush="{DynamicResource Brush.BorderStrong}" Background="{DynamicResource Brush.Card}"
-                        Command="{Binding NextDayCommand}" IsEnabled="{Binding CanGoNext}" ToolTip="Nasledujúci deň" AutomationProperties.Name="Nasledujúci deň">
+                        Command="{Binding NextDayCommand}" IsEnabled="{Binding CanGoNext}" ToolTip="{l:T today.next}" AutomationProperties.Name="{l:T today.next}">
                     <c:IconView Data="{StaticResource Icon.ChevronRight}" Width="16" Height="16"/>
                 </Button>
             </StackPanel>
@@ -26,7 +27,7 @@
         <UniformGrid Columns="4" Margin="-8,0,-8,20">
             <Border Style="{StaticResource Card}" Margin="8,0">
                 <StackPanel>
-                    <TextBlock Text="AKTÍVNY ČAS" Style="{StaticResource Text.Caps}"/>
+                    <TextBlock Text="{l:T today.active}" Style="{StaticResource Text.Caps}"/>
                     <TextBlock Text="{Binding ActiveText}" Style="{StaticResource Text.Value}" Margin="0,8,0,2"/>
                     <TextBlock Text="{Binding ActiveSub}" Style="{StaticResource Text.Muted}"/>
                 </StackPanel>
@@ -35,7 +36,7 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="7" Height="7" Fill="{Binding TopCategoryBrush}" Margin="0,0,7,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="NAJVIAC ČASU" Style="{StaticResource Text.Caps}"/>
+                        <TextBlock Text="{l:T today.topCategory}" Style="{StaticResource Text.Caps}"/>
                     </StackPanel>
                     <TextBlock Text="{Binding TopCategoryText}" Style="{StaticResource Text.Value}" Margin="0,8,0,2" TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{Binding TopCategorySub}" Style="{StaticResource Text.Muted}"/>
@@ -43,14 +44,14 @@
             </Border>
             <Border Style="{StaticResource Card}" Margin="8,0">
                 <StackPanel>
-                    <TextBlock Text="NEČINNOSŤ (NEZAPOČÍTANÉ)" Style="{StaticResource Text.Caps}"/>
+                    <TextBlock Text="{l:T today.idle}" Style="{StaticResource Text.Caps}"/>
                     <TextBlock Text="{Binding IdleText}" Style="{StaticResource Text.Value}" Margin="0,8,0,2"/>
                     <TextBlock Text="{Binding IdleSub}" Style="{StaticResource Text.Muted}"/>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource Card}" Margin="8,0">
                 <StackPanel>
-                    <TextBlock Text="NAJPOUŽÍVANEJŠIA APLIKÁCIA" Style="{StaticResource Text.Caps}"/>
+                    <TextBlock Text="{l:T today.topApp}" Style="{StaticResource Text.Caps}"/>
                     <TextBlock Text="{Binding TopAppText}" Style="{StaticResource Text.Value}" Margin="0,8,0,2" TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{Binding TopAppSub}" Style="{StaticResource Text.Muted}"/>
                 </StackPanel>
@@ -61,7 +62,7 @@
         <Border Style="{StaticResource Card}" Margin="0,0,0,20">
             <StackPanel>
                 <DockPanel Margin="0,0,0,18">
-                    <TextBlock Text="Časová os dňa" Style="{StaticResource Text.H2}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{l:T today.timeline}" Style="{StaticResource Text.H2}" VerticalAlignment="Center"/>
                     <ItemsControl ItemsSource="{Binding Legend}" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
@@ -90,8 +91,8 @@
 
             <Border Style="{StaticResource Card}">
                 <StackPanel>
-                    <TextBlock Text="Top aplikácie" Style="{StaticResource Text.H2}" Margin="0,0,0,16"/>
-                    <TextBlock Text="Zatiaľ žiadna aktivita. Čas sa začne zbierať, keď budeš pracovať v nejakej aplikácii."
+                    <TextBlock Text="{l:T today.topApps}" Style="{StaticResource Text.H2}" Margin="0,0,0,16"/>
+                    <TextBlock Text="{l:T today.empty}"
                                Style="{StaticResource Text.Muted}" Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
                     <ItemsControl ItemsSource="{Binding Apps}">
                         <ItemsControl.ItemTemplate>
@@ -124,7 +125,7 @@
 
             <Border Grid.Column="2" Style="{StaticResource Card}">
                 <StackPanel>
-                    <TextBlock Text="Kategórie" Style="{StaticResource Text.H2}" Margin="0,0,0,16"/>
+                    <TextBlock Text="{l:T today.categories}" Style="{StaticResource Text.H2}" Margin="0,0,0,16"/>
                     <c:ProportionBar Items="{Binding Shares}" Margin="0,0,0,18"/>
                     <ItemsControl ItemsSource="{Binding Categories}">
                         <ItemsControl.ItemTemplate>

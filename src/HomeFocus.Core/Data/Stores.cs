@@ -68,11 +68,12 @@ public sealed class CategoryStore(Database db)
     {
         using var c = db.Open();
         using var cmd = c.CreateCommand();
-        cmd.CommandText = "SELECT id, name, color, is_builtin, sort_order FROM categories ORDER BY sort_order, id;";
+        cmd.CommandText = "SELECT id, name, color, is_builtin, sort_order, key FROM categories ORDER BY sort_order, id;";
         using var rd = cmd.ExecuteReader();
         var list = new List<Category>();
         while (rd.Read())
-            list.Add(new Category(rd.GetInt64(0), rd.GetString(1), rd.GetString(2), rd.GetInt64(3) != 0, (int)rd.GetInt64(4)));
+            list.Add(new Category(rd.GetInt64(0), rd.GetString(1), rd.GetString(2), rd.GetInt64(3) != 0, (int)rd.GetInt64(4),
+                rd.IsDBNull(5) ? null : rd.GetString(5)));
         return list;
     }
 
@@ -80,7 +81,7 @@ public sealed class CategoryStore(Database db)
     {
         using var c = db.Open();
         var order = Convert.ToInt32(Database.Scalar(c, "SELECT COALESCE(MAX(sort_order), 0) FROM categories;"));
-        // keep "Ostatné"-style fallback last: new categories go before the highest built-in order
+        // keep the "Other" fallback last: new categories go before the highest built-in order
         Database.Exec(c, "UPDATE categories SET sort_order = sort_order + 1 WHERE sort_order = $o;", null, ("$o", order));
         Database.Exec(c, "INSERT INTO categories(name, color, is_builtin, sort_order) VALUES ($n, $c, 0, $o);", null,
             ("$n", name), ("$c", color), ("$o", order));

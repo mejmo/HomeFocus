@@ -31,7 +31,7 @@ public sealed class Categorizer
         long? result = null;
         foreach (var (rule, regex) in _ordered)
         {
-            var ok = regex?.IsMatch(appKey) ?? string.Equals(rule.Pattern, appKey, StringComparison.OrdinalIgnoreCase);
+            var ok = regex is null ? string.Equals(rule.Pattern, appKey, StringComparison.OrdinalIgnoreCase) : SafeMatch(regex, appKey);
             if (ok) { result = rule.CategoryId; break; }
         }
         _cache[appKey] = result ?? -1;
@@ -39,11 +39,18 @@ public sealed class Categorizer
     }
 
     public static bool Matches(string pattern, string value) =>
-        HasWildcard(pattern) ? ToRegex(pattern).IsMatch(value) : string.Equals(pattern, value, StringComparison.OrdinalIgnoreCase);
+        HasWildcard(pattern) ? SafeMatch(ToRegex(pattern), value) : string.Equals(pattern, value, StringComparison.OrdinalIgnoreCase);
+
+    // Patterns like "*a*a*a*..." could backtrack for a long time; a timeout just means "no match".
+    private static bool SafeMatch(Regex r, string value)
+    {
+        try { return r.IsMatch(value); }
+        catch (RegexMatchTimeoutException) { return false; }
+    }
 
     private static bool HasWildcard(string p) => p.Contains('*') || p.Contains('?');
 
     private static Regex ToRegex(string pattern) => new(
         "^" + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$",
-        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 }

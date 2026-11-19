@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HomeFocus.App.Controls;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 
 namespace HomeFocus.App.ViewModels;
@@ -8,12 +9,11 @@ namespace HomeFocus.App.ViewModels;
 public sealed partial class TodayViewModel : PageViewModel
 {
     [ObservableProperty] private DateOnly _day = DateOnly.FromDateTime(DateTime.Now);
-    [ObservableProperty] private string _title = "Dnes";
+    [ObservableProperty] private string _title = "";
     [ObservableProperty] private string _dateText = "";
     [ObservableProperty] private string _activeText = "";
     [ObservableProperty] private string _activeSub = "";
-    [ObservableProperty] private string _topCategoryLabel = "Najviac času";
-    [ObservableProperty] private string _topCategoryText = "—";
+        [ObservableProperty] private string _topCategoryText = "—";
     [ObservableProperty] private string _topCategorySub = "";
     [ObservableProperty] private System.Windows.Media.Brush? _topCategoryBrush;
     [ObservableProperty] private string _idleText = "";
@@ -45,44 +45,43 @@ public sealed partial class TodayViewModel : PageViewModel
         var prev = s.Reports.GetDay(Day.AddDays(-1));
         var isToday = Day == Today;
 
-        Title = isToday ? "Dnes" : Day == Today.AddDays(-1) ? "Včera" : Format.Capitalize(Day.ToString("dddd", Format.Sk));
+        Title = isToday ? Loc.T("today.title") : Day == Today.AddDays(-1) ? Loc.T("today.yesterday") : Format.Capitalize(Day.ToString("dddd", Loc.Culture));
         DateText = Format.Day(Day);
         CanGoNext = Day < Today;
 
         ActiveText = Format.Duration(d.Active);
         var diff = d.Active - prev.Active;
-        ActiveSub = prev.Active == TimeSpan.Zero ? "predchádzajúci deň bez záznamu"
-            : Math.Abs(diff.TotalMinutes) < 1 ? "rovnako ako deň predtým"
-            : $"o {Format.Duration(diff.Duration())} {(diff > TimeSpan.Zero ? "viac" : "menej")} ako deň predtým";
+        ActiveSub = prev.Active == TimeSpan.Zero ? Loc.T("today.noPrev")
+            : Math.Abs(diff.TotalMinutes) < 1 ? Loc.T("today.same")
+            : Loc.F(diff > TimeSpan.Zero ? "today.more" : "today.less", Format.Duration(diff.Duration()));
 
         if (d.Categories.Count > 0)
         {
             var top = d.Categories[0];
             var c = s.Category(top.CategoryId);
-            TopCategoryLabel = "Najviac času";
             TopCategoryText = c.Name;
             TopCategoryBrush = c.Brush;
-            TopCategorySub = $"{Format.Duration(top.Duration)} · {top.Duration.TotalSeconds / Math.Max(1, d.Active.TotalSeconds) * 100:0} % aktívneho času";
+            TopCategorySub = Loc.F("today.share", Format.Duration(top.Duration), top.Duration.TotalSeconds / Math.Max(1, d.Active.TotalSeconds) * 100);
         }
         else
         {
             TopCategoryText = "—";
             TopCategoryBrush = null;
-            TopCategorySub = "zatiaľ nič";
+            TopCategorySub = Loc.T("today.nothing");
         }
 
         IdleText = Format.Duration(d.Idle);
-        IdleSub = $"prah nečinnosti {s.Tracking.IdleThreshold.TotalMinutes:0} min";
+        IdleSub = Loc.F("today.threshold", s.Tracking.IdleThreshold.TotalMinutes);
         TopAppText = d.Apps.Count > 0 ? d.Apps[0].DisplayName : "—";
-        TopAppSub = d.Apps.Count > 0 ? Format.Duration(d.Apps[0].Duration) : "zatiaľ nič";
+        TopAppSub = d.Apps.Count > 0 ? Format.Duration(d.Apps[0].Duration) : Loc.T("today.nothing");
 
         var dayStart = Day.ToDateTime(TimeOnly.MinValue);
         double H(DateTime t) => (t - dayStart).TotalHours;
         Timeline = d.Timeline.Select(t =>
         {
-            var name = t.CategoryId is { } id ? s.Category(id).Name : "Nečinnosť";
+            var name = t.CategoryId is { } id ? s.Category(id).Name : Loc.T("common.idle");
             return new TimelineItem(H(t.StartLocal), H(t.EndLocal), t.CategoryId is { } cid ? s.Category(cid).Brush : null,
-                $"{t.StartLocal:HH:mm}–{t.EndLocal:HH:mm} · {t.Label}{(t.CategoryId is null ? "" : $" · {name}")}");
+                $"{t.StartLocal:HH:mm}–{t.EndLocal:HH:mm} · {(t.CategoryId is null ? name : $"{t.Label} · {name}")}");
         }).ToList();
         var first = Timeline.Count > 0 ? Timeline.Min(t => t.StartHour) : 8;
         TimelineStart = Math.Max(0, Math.Min(6, Math.Floor(first)));

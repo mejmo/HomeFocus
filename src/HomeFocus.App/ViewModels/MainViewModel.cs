@@ -1,6 +1,7 @@
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 using HomeFocus.Core;
 
@@ -29,7 +30,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private PageViewModel _current;
     [ObservableProperty] private bool _isPaused;
-    [ObservableProperty] private string _statusText = "Sledovanie aktívne";
+    [ObservableProperty] private string _statusText = Loc.T("status.active");
     [ObservableProperty] private string _nowText = "";
 
     public PageViewModel CurrentPage
@@ -72,17 +73,17 @@ public sealed partial class MainViewModel : ObservableObject
         IsPaused = t.IsPaused;
         if (IsPaused && t.PausedUntilUtc is { } u)
         {
-            StatusText = "Pozastavené";
-            NowText = $"do {u.ToLocalTime():HH:mm}";
+            StatusText = Loc.T("status.paused");
+            NowText = Loc.F("status.until", u.ToLocalTime());
         }
         else
         {
-            StatusText = "Sledovanie aktívne";
+            StatusText = Loc.T("status.active");
             NowText = t.Current switch
             {
-                { Kind: ActivityKind.App } c => $"Teraz: {c.DisplayName} · {Format.Duration(c.Duration)}",
-                { Kind: ActivityKind.Idle } c => $"Nečinnosť · {Format.Duration(c.Duration)}",
-                _ => "Čaká sa na aktivitu",
+                { Kind: ActivityKind.App } c => Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)),
+                { Kind: ActivityKind.Idle } c => Loc.F("status.idle", Format.Duration(c.Duration)),
+                _ => Loc.T("status.waiting"),
             };
         }
         if (++_ticks % 10 == 0) Current.OnTimer();

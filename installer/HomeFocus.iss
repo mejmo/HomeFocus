@@ -1,4 +1,4 @@
-; HomeFocus installer (Inno Setup 6). Per-user install, no admin rights needed.
+﻿; HomeFocus installer (Inno Setup 6). Per-user install, no admin rights needed.
 ; Build: ISCC.exe /DAppVersion=1.2.3 /DPublishDir=..\publish installer\HomeFocus.iss
 
 #ifndef AppVersion
@@ -37,13 +37,14 @@ CloseApplications=no
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "cs"; MessagesFile: "compiler:Languages\Czech.isl"
+; English by default, Slovak when Windows uses Slovak (needs Inno Setup 6.5+).
+Name: "sk"; MessagesFile: "Languages\Slovak.isl"
 
 [CustomMessages]
 en.Autostart=Start HomeFocus when I sign in to Windows
-cs.Autostart=Spouštět HomeFocus po přihlášení do Windows
+sk.Autostart=Spúšťať HomeFocus po prihlásení do Windows
 en.LaunchNow=Launch HomeFocus
-cs.LaunchNow=Spustit HomeFocus
+sk.LaunchNow=Spustiť HomeFocus
 
 [Tasks]
 Name: "autostart"; Description: "{cm:Autostart}"

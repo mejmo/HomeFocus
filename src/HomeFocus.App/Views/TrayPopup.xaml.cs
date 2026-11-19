@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HomeFocus.App.Controls;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 using HomeFocus.App.ViewModels;
 using HomeFocus.Core;
@@ -25,8 +26,8 @@ public sealed partial class TrayPopupViewModel : ObservableObject
         Shares = RowBuilder.Shares(d.Categories);
         Categories = RowBuilder.Categories(d.Categories).Take(4).ToList();
         IsPaused = s.Tracking.IsPaused;
-        PillText = IsPaused && s.Tracking.PausedUntilUtc is { } u ? $"Pauza do {u.ToLocalTime():HH:mm}" : "Sleduje sa";
-        NowText = s.Tracking.Current is { Kind: ActivityKind.App } c ? $"Teraz: {c.DisplayName} · {Format.Duration(c.Duration)}" : "";
+        PillText = IsPaused && s.Tracking.PausedUntilUtc is { } u ? Loc.F("tray.pausedUntil", u.ToLocalTime()) : Loc.T("tray.tracking");
+        NowText = s.Tracking.Current is { Kind: ActivityKind.App } c ? Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)) : "";
     }
 }
 

@@ -63,7 +63,6 @@ public sealed partial class Win32ForegroundSource : IForegroundSource
             catch (IOException) { }
             catch (UnauthorizedAccessException) { }
         }
-        if (key == "explorer.exe") n = "Prieskumník";
         return _names[key] = n;
     }
 

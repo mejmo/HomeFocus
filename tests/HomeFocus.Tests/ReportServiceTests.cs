@@ -19,9 +19,9 @@ public sealed class ReportServiceTests : IDisposable
         _store = new ActivityStore(_db);
         _device = new SettingsStore(_db).DeviceId();
         var cats = new CategoryStore(_db).GetAll();
-        _work = cats.Single(c => c.Name == "Práca").Id;
-        _fun = cats.Single(c => c.Name == "Zábava").Id;
-        _other = cats.Single(c => c.Name == "Ostatné").Id;
+        _work = cats.Single(c => c.Key == "work").Id;
+        _fun = cats.Single(c => c.Key == "entertainment").Id;
+        _other = cats.Single(c => c.Key == "other").Id;
     }
 
     private ReportService Service() => new(_store, () => new Categorizer(new RuleStore(_db).GetAll(), _other));

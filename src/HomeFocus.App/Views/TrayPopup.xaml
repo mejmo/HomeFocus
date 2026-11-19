@@ -1,6 +1,7 @@
 <Window x:Class="HomeFocus.App.Views.TrayPopup"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:HomeFocus.App.Localization"
         xmlns:c="clr-namespace:HomeFocus.App.Controls"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" ResizeMode="NoResize"
         Width="380" SizeToContent="Height" ShowInTaskbar="False" Topmost="True"
@@ -41,7 +42,7 @@
                 </StackPanel>
             </DockPanel>
 
-            <TextBlock Text="Dnes aktívne" Style="{StaticResource Text.Muted}" Margin="0,16,0,0"/>
+            <TextBlock Text="{l:T tray.todayActive}" Style="{StaticResource Text.Muted}" Margin="0,16,0,0"/>
             <TextBlock Text="{Binding ActiveText}" Style="{StaticResource Text.Value}" FontSize="30"/>
             <c:ProportionBar Items="{Binding Shares}" Height="8" Margin="0,10,0,10"/>
             <ItemsControl ItemsSource="{Binding Categories}">
@@ -67,13 +68,13 @@
             <Button Style="{StaticResource MenuButton}" Click="Open_Click">
                 <StackPanel Orientation="Horizontal">
                     <c:IconView Data="{StaticResource Icon.Window}" Margin="0,0,12,0"/>
-                    <TextBlock Text="Otvoriť dashboard"/>
+                    <TextBlock Text="{l:T tray.open}"/>
                 </StackPanel>
             </Button>
             <Grid Visibility="{Binding IsPaused, Converter={StaticResource InverseBoolToVis}}">
                 <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
                     <c:IconView Data="{StaticResource Icon.Pause}" Margin="0,0,12,0"/>
-                    <TextBlock Text="Pozastaviť" VerticalAlignment="Center"/>
+                    <TextBlock Text="{l:T tray.pause}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="15 min" Style="{StaticResource Button.Ghost}" Padding="10,0" Click="Pause_Click" x:Name="P15"/>
@@ -84,13 +85,13 @@
             <Button Style="{StaticResource MenuButton}" Click="Resume_Click" Visibility="{Binding IsPaused, Converter={StaticResource BoolToVis}}">
                 <StackPanel Orientation="Horizontal">
                     <c:IconView Data="{StaticResource Icon.Play}" Margin="0,0,12,0" Filled="True" StrokeThickness="1.5"/>
-                    <TextBlock Text="Pokračovať v sledovaní"/>
+                    <TextBlock Text="{l:T resume.name}"/>
                 </StackPanel>
             </Button>
             <Button Style="{StaticResource MenuButton}" Click="Quit_Click" Foreground="{DynamicResource Brush.Muted}">
                 <StackPanel Orientation="Horizontal">
                     <c:IconView Data="{StaticResource Icon.Power}" Margin="0,0,12,0"/>
-                    <TextBlock Text="Ukončiť HomeFocus"/>
+                    <TextBlock Text="{l:T tray.quit}"/>
                 </StackPanel>
             </Button>
         </StackPanel>

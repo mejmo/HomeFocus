@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Views;
 using HomeFocus.Core.Reports;
 using Microsoft.Win32;
@@ -22,13 +23,13 @@ public static class ExportHelper
         try
         {
             var n = CsvExporter.Export(s.Activities, s.Categorizer, s.CategoryList.ToDictionary(c => c.Id, c => c.Name), f, t, dlg.FileName);
-            if (MessageDialog.Show("Export hotový", $"Uložených {n} záznamov do súboru {System.IO.Path.GetFileName(dlg.FileName)}.",
-                    "Otvoriť priečinok", "Zavrieť"))
-                Process.Start("explorer.exe", $"/select,\"{dlg.FileName}\"");
+            if (MessageDialog.Show(Loc.T("export.done"), Loc.F("export.doneText", n, System.IO.Path.GetFileName(dlg.FileName)),
+                    Loc.T("common.openFolder"), Loc.T("common.close")))
+                Process.Start(new ProcessStartInfo("explorer.exe") { ArgumentList = { "/select," + dlg.FileName } });
         }
         catch (IOException ex)
         {
-            MessageDialog.Show("Export zlyhal", ex.Message, null, "Zavrieť");
+            MessageDialog.Show(Loc.T("export.failed"), ex.Message, null, Loc.T("common.close"));
         }
     }
 }

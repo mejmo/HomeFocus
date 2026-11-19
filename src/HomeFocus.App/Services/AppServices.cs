@@ -62,12 +62,16 @@ public sealed class AppServices : IDisposable
     public void ReloadLookups()
     {
         var cats = Categories.GetAll();
-        // The fallback is the built-in category sorted last ("Ostatné").
+        // The fallback is the built-in category sorted last ("Other").
         FallbackCategoryId = cats.Where(c => c.IsBuiltIn).OrderBy(c => c.SortOrder).Last().Id;
-        _categories = cats.Select(c => new CategoryInfo(c.Id, c.Name, c.Color, Brush(c.Color, 1), Brush(c.Color, 0.14), c.IsBuiltIn)).ToList();
+        _categories = cats.Select(c => new CategoryInfo(c.Id, DisplayName(c), c.Color, Brush(c.Color, 1), Brush(c.Color, 0.14), c.IsBuiltIn)).ToList();
         _categorizer = new Categorizer(Rules.GetAll(), FallbackCategoryId);
         LookupsChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <summary>Built-in categories are shown in the UI language; user categories keep their own name.</summary>
+    private static string DisplayName(Category c) =>
+        c.Key is { } k ? HomeFocus.App.Localization.Loc.T("cat." + k) : c.Name;
 
     private static SolidColorBrush Brush(string hex, double alpha)
     {

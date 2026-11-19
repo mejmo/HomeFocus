@@ -1,5 +1,6 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Threading;
+using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 using HomeFocus.App.ViewModels;
 using HomeFocus.App.Views;
@@ -21,6 +22,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        Loc.Init();
 
         _mutex = new Mutex(true, MutexName, out var first);
         if (!first)
@@ -34,11 +36,16 @@ public partial class App : Application
         DispatcherUnhandledException += OnUnhandled;
         try
         {
-            _services = new AppServices(Environment.GetEnvironmentVariable("HOMEFOCUS_DB") ?? Database.DefaultPath);
+            var dbPath = Database.DefaultPath;
+#if DEBUG
+            dbPath = Environment.GetEnvironmentVariable("HOMEFOCUS_DB") ?? dbPath; // dev/test override only
+#endif
+            if (dbPath == Database.DefaultPath) Database.MoveLegacyDatabase();
+            _services = new AppServices(dbPath);
         }
         catch (Exception ex)
         {
-            MessageDialog.Show("HomeFocus sa nepodarilo spustiť", $"Databázu sa nepodarilo otvoriť: {ex.Message}", null, "Zavrieť");
+            MessageDialog.Show(Loc.T("error.startTitle"), Loc.F("error.db", ex.Message), null, Loc.T("common.close"));
             Shutdown(1);
             return;
         }
@@ -103,6 +110,6 @@ public partial class App : Application
     {
         System.Diagnostics.Debug.WriteLine(e.Exception);
         e.Handled = true;
-        MessageDialog.Show("Niečo sa pokazilo", e.Exception.Message, null, "Zavrieť");
+        MessageDialog.Show(Loc.T("error.generic"), e.Exception.Message, null, Loc.T("common.close"));
     }
 }

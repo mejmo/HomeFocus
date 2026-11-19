@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeFocus – stay in focus while you work from home</title>
+<meta name="description" content="HomeFocus is a self-hosted Windows time tracker. It shows where your working day goes and never sends anything to the cloud.">
+<link rel="icon" href="images/icon-256.png">
+<style>
+:root{--bg:#F4F5F7;--card:#FFFFFF;--border:#E3E5EA;--text:#16181D;--muted:#5B6270;--accent:#2F5BEA;--accent-soft:#E6ECFD;--ok:#15803D}
+@media (prefers-color-scheme: dark){:root{--bg:#121418;--card:#1B1E24;--border:#2A2E37;--text:#E8EAEE;--muted:#9AA1AE;--accent:#5B8BFF;--accent-soft:#1F2C4D;--ok:#3DD68C}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{padding:28px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
+header img{height:44px}
+nav a{margin-left:20px;text-decoration:none;color:var(--muted);font-weight:500}
+nav a:hover{color:var(--text)}
+.hero{text-align:center;padding:48px 0 32px}
+.hero h1{font:600 clamp(32px,5vw,54px)/1.12 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;margin:0 0 16px;letter-spacing:-.01em}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:19px;color:var(--muted);max-width:640px;margin:0 auto 28px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);margin-left:8px}
+.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px;font-size:14px;color:var(--muted)}
+.pills span{border:1px solid var(--border);border-radius:99px;padding:4px 12px;background:var(--card)}
+.shot{margin:36px auto 0;border-radius:14px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(20,24,32,.18);overflow:hidden;max-width:1000px}
+.shot img{display:block;width:100%;height:auto}
+section{padding:64px 0}
+h2{font:600 30px/1.2 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;margin:0 0 12px}
+.lead{color:var(--muted);max-width:680px;margin:0 0 32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+.card h3{margin:0 0 6px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.privacy{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.privacy ul{margin:0;padding:0;list-style:none}
+.privacy li{padding:8px 0 8px 30px;position:relative;border-bottom:1px solid var(--border)}
+.privacy li:last-child{border-bottom:0}
+.privacy li::before{content:"";position:absolute;left:4px;top:15px;width:12px;height:7px;border-left:2.5px solid var(--ok);border-bottom:2.5px solid var(--ok);transform:rotate(-45deg)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+.two img{width:100%;border-radius:12px;border:1px solid var(--border)}
+footer{padding:40px 0;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--border)}
+@media (max-width:760px){.privacy,.two{grid-template-columns:1fr}nav{display:none}.btn.ghost{margin:10px 0 0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logo-dark.png">
+      <img src="images/logo-light.png" alt="HomeFocus">
+    </picture>
+    <nav aria-label="Sections">
+      <a href="#why">Why</a><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="https://github.com/mejmo/HomeFocus">GitHub</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Stay in <span>focus</span> while you<br>work from home.</h1>
+    <p>HomeFocus quietly tracks where your time goes on your Windows PC, so you notice when deep work turns into scrolling. Self-hosted, private, and nothing ever leaves your computer.</p>
+    <a class="btn" href="https://github.com/mejmo/HomeFocus/releases/latest">Download for Windows</a>
+    <a class="btn ghost" href="https://github.com/mejmo/HomeFocus">View source</a>
+    <div class="pills"><span>Windows 10 &amp; 11</span><span>Signed installer</span><span>No account</span><span>No cloud</span><span>English &amp; Slovak</span></div>
+    <div class="shot"><img src="images/screenshot.png" alt="HomeFocus weekly overview: time by category and app ranking" width="1280" height="840"></div>
+  </div>
+</div>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Working from home blurs the day</h2>
+    <p class="lead">At the office the day has edges. At home, a quick look at chat becomes half an hour, and the evening slides into "just one more thing". HomeFocus gives you an honest picture of your day, without judgement and without effort: it just runs in the tray.</p>
+    <div class="two">
+      <img src="images/today.png" alt="HomeFocus Today view with a day timeline and top apps" loading="lazy" width="1280" height="840">
+      <img src="images/screenshot.png" alt="HomeFocus weekly overview" loading="lazy" width="1280" height="840">
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>What you get</h2>
+    <p class="lead">Everything you need to see your working day clearly, nothing you have to babysit.</p>
+    <div class="grid">
+      <div class="card"><h3>Automatic tracking</h3><p>Records the app in front of you once a second. Idle time, breaks and sleep are detected and left out.</p></div>
+      <div class="card"><h3>Day timeline</h3><p>See your day as a colored strip: work, communication, entertainment and the breaks in between.</p></div>
+      <div class="card"><h3>Weekly &amp; monthly overview</h3><p>Totals, daily averages, your busiest day and an app ranking. Export everything to CSV.</p></div>
+      <div class="card"><h3>Your categories</h3><p>Apps are sorted automatically. Reassign one with a click and the rule applies to your whole history.</p></div>
+      <div class="card"><h3>Lives in the tray</h3><p>Starts with Windows, shows today at a glance and pauses tracking for 15 minutes or an hour.</p></div>
+      <div class="card"><h3>Looks at home on Windows</h3><p>Light and dark theme that follows Windows, in English or Slovak.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="privacy">
+      <div>
+        <h2>Self-hosted. Nothing goes to the cloud.</h2>
+        <p class="lead" style="margin:0">HomeFocus has no server, no account and no telemetry. It does not even contain networking code. Your history is a single SQLite file in your own Windows profile, and you can export or delete it whenever you like.</p>
+      </div>
+      <ul>
+        <li>Runs and stores data only on your PC</li>
+        <li>No sign-up, no tracking of you by us</li>
+        <li>Records app names only: no window titles, no keystrokes, no screenshots</li>
+        <li>Kept out of roaming profiles, so it never syncs to a server</li>
+        <li>Signed installer, no admin rights needed</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">HomeFocus · made for people who work from home · <a href="https://github.com/mejmo/HomeFocus">GitHub</a></div>
+</footer>
+</body>
+</html>
