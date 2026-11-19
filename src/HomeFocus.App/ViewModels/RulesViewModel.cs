@@ -58,7 +58,7 @@ public sealed partial class UncategorizedRow(RulesViewModel owner, string appKey
 public sealed partial class RulesViewModel : PageViewModel
 {
     public static readonly string[] Palette =
-        ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7", "#9C755F", "#BAB0AC"];
+        ["#4477AA", "#EE6677", "#CCBB44", "#66CCEE", "#AA3377", "#BBBBBB", "#0077BB", "#EE7733", "#33BBEE"];
 
     [ObservableProperty] private IReadOnlyList<CategoryFilterRow> _categoryRows = [];
     [ObservableProperty] private IReadOnlyList<RuleRow> _rules = [];

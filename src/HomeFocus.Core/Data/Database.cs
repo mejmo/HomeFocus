@@ -5,7 +5,7 @@ namespace HomeFocus.Core.Data;
 /// <summary>Opens the SQLite file and keeps its schema up to date.</summary>
 public sealed class Database
 {
-    public const int SchemaVersion = 7;
+    public const int SchemaVersion = 8;
 
     private readonly string _connectionString;
 
@@ -63,6 +63,7 @@ public sealed class Database
         if (version < 5) MigrateV5(c);
         if (version < 6) MigrateV6(c);
         if (version < 7) MigrateV7(c);
+        if (version < 8) MigrateV8(c);
     }
 
     private static void CreateV1(SqliteConnection c)
@@ -111,16 +112,16 @@ public sealed class Database
 
         var cats = new (string Key, string Name, string Color, string[] Patterns)[]
         {
-            ("work", "Work", "#4E79A7", ["devenv.exe", "code.exe", "rider64.exe", "idea64.exe", "winword.exe", "excel.exe",
+            ("work", "Work", "#4477AA", ["devenv.exe", "code.exe", "rider64.exe", "idea64.exe", "winword.exe", "excel.exe",
                 "powerpnt.exe", "onenote.exe", "windowsterminal.exe", "wt.exe", "powershell.exe", "pwsh.exe", "cmd.exe",
                 "ssms.exe", "notepad++.exe", "figma.exe", "postman.exe", "github*.exe"]),
-            ("communication", "Communication", "#76B7B2", ["outlook.exe", "olk.exe", "ms-teams.exe", "teams.exe", "slack.exe", "zoom.exe",
+            ("communication", "Communication", "#66CCEE", ["outlook.exe", "olk.exe", "ms-teams.exe", "teams.exe", "slack.exe", "zoom.exe",
                 "thunderbird.exe", "signal.exe", "telegram.exe", "whatsapp*.exe"]),
-            ("entertainment", "Entertainment", "#F28E2B", ["spotify.exe", "steam.exe", "steamwebhelper.exe", "epicgameslauncher.exe", "vlc.exe",
+            ("entertainment", "Entertainment", "#EE7733", ["spotify.exe", "steam.exe", "steamwebhelper.exe", "epicgameslauncher.exe", "vlc.exe",
                 "netflix.exe", "battle.net.exe", "leagueclient*.exe", "riotclient*.exe"]),
-            ("social", "Social media", "#FF9DA7", ["discord.exe", "messenger.exe"]),
-            ("education", "Learning", "#B07AA1", ["anki.exe", "kindle.exe", "obsidian.exe"]),
-            ("other", "Other", "#BAB0AC", []),
+            ("social", "Social media", "#EE6677", ["discord.exe", "messenger.exe"]),
+            ("education", "Learning", "#AA3377", ["anki.exe", "kindle.exe", "obsidian.exe"]),
+            ("other", "Other", "#BBBBBB", []),
         };
         for (var i = 0; i < cats.Length; i++)
         {
@@ -214,6 +215,15 @@ public sealed class Database
         using var tx = c.BeginTransaction();
         Exec(c, "UPDATE categories SET color = CASE upper(color) WHEN '#60A5FA' THEN '#4E79A7' WHEN '#2DD4BF' THEN '#76B7B2' WHEN '#FB923C' THEN '#F28E2B' WHEN '#F472B6' THEN '#FF9DA7' WHEN '#A78BFA' THEN '#B07AA1' WHEN '#4ADE80' THEN '#59A14F' WHEN '#FACC15' THEN '#EDC948' WHEN '#F87171' THEN '#E15759' WHEN '#38BDF8' THEN '#9C755F' WHEN '#CBD5E1' THEN '#BAB0AC' END WHERE upper(color) IN ('#60A5FA', '#2DD4BF', '#FB923C', '#F472B6', '#A78BFA', '#4ADE80', '#FACC15', '#F87171', '#38BDF8', '#CBD5E1');", tx);
         Exec(c, "PRAGMA user_version = 7;", tx);
+        tx.Commit();
+    }
+
+    /// <summary>v8: colorblind-safe palette (Paul Tol); colors picked outside the palettes are kept.</summary>
+    private static void MigrateV8(SqliteConnection c)
+    {
+        using var tx = c.BeginTransaction();
+        Exec(c, "UPDATE categories SET color = CASE upper(color) WHEN '#4E79A7' THEN '#4477AA' WHEN '#76B7B2' THEN '#66CCEE' WHEN '#F28E2B' THEN '#EE7733' WHEN '#FF9DA7' THEN '#EE6677' WHEN '#B07AA1' THEN '#AA3377' WHEN '#59A14F' THEN '#CCBB44' WHEN '#EDC948' THEN '#CCBB44' WHEN '#E15759' THEN '#EE6677' WHEN '#9C755F' THEN '#0077BB' WHEN '#BAB0AC' THEN '#BBBBBB' END WHERE upper(color) IN ('#4E79A7', '#76B7B2', '#F28E2B', '#FF9DA7', '#B07AA1', '#59A14F', '#EDC948', '#E15759', '#9C755F', '#BAB0AC');", tx);
+        Exec(c, "PRAGMA user_version = 8;", tx);
         tx.Commit();
     }
 
