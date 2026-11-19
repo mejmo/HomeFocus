@@ -135,7 +135,7 @@
                                                        Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"/>
                                         </StackPanel>
                                         <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{Binding Tint}" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Category}" Foreground="{Binding Brush}" FontSize="11.5" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Category}" Foreground="{Binding TextBrush}" FontSize="11.5" FontWeight="SemiBold"/>
                                         </Border>
                                         <TextBlock Grid.Column="3" Text="{Binding Time}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                                         <TextBlock Grid.Column="4" Text="{Binding Share}" Foreground="{DynamicResource Brush.Muted}" HorizontalAlignment="Right"/>

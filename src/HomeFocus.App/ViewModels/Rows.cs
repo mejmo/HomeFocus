@@ -6,7 +6,7 @@ using HomeFocus.Core.Reports;
 namespace HomeFocus.App.ViewModels;
 
 public sealed record AppRow(int Rank, string Name, string AppKey, string Category, Brush Brush, Brush Tint, string Time, double Fraction, string Share,
-    bool IsWeb = false)
+    bool IsWeb = false, Brush? TextBrush = null)
 {
     public string Initial => Name.Length > 0 ? Name[..1].ToUpperInvariant() : "?";
 }
@@ -31,7 +31,7 @@ internal static class RowBuilder
         {
             var c = s.Category(a.CategoryId);
             return new AppRow(i + 1, a.DisplayName, a.AppKey, c.Name, c.Brush, c.Tint, Format.Duration(a.Duration),
-                a.Duration.TotalSeconds / max, $"{a.Duration.TotalSeconds / total * 100:0} %", a.Kind == HomeFocus.Core.ActivityKind.Web);
+                a.Duration.TotalSeconds / max, $"{a.Duration.TotalSeconds / total * 100:0} %", a.Kind == HomeFocus.Core.ActivityKind.Web, c.TextBrush);
         }).ToList();
     }
 

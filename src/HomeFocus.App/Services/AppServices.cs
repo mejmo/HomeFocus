@@ -8,7 +8,8 @@ using HomeFocus.Core.Tracking;
 namespace HomeFocus.App.Services;
 
 /// <summary>Category as the UI shows it.</summary>
-public sealed record CategoryInfo(long Id, string Name, string Hex, SolidColorBrush Brush, SolidColorBrush Tint, bool IsBuiltIn)
+/// <param name="TextBrush">The color for text (chips, initials): the color itself on dark, a darker shade on light so it stays readable.</param>
+public sealed record CategoryInfo(long Id, string Name, string Hex, SolidColorBrush Brush, SolidColorBrush Tint, bool IsBuiltIn, SolidColorBrush TextBrush)
 {
     public override string ToString() => Name;
 }
@@ -32,6 +33,7 @@ public sealed class AppServices : IDisposable
         DeviceId = Settings.DeviceId();
 
         ReloadLookups();
+        ThemeManager.Changed += (_, _) => ReloadLookups(); // text shades depend on light/dark
         Browser = new BrowserState();
         Pairing = new PairingTokens(Settings);
         var tracker = new ActivityTracker(new Win32ForegroundSource(), Activities, DeviceId, Browser, host => Categorizer.SiteFor(host))
@@ -83,7 +85,8 @@ public sealed class AppServices : IDisposable
         var cats = Categories.GetAll();
         // The fallback is the built-in category sorted last ("Other").
         FallbackCategoryId = cats.Where(c => c.IsBuiltIn).OrderBy(c => c.SortOrder).Last().Id;
-        _categories = cats.Select(c => new CategoryInfo(c.Id, DisplayName(c), c.Color, Brush(c.Color, 1), Brush(c.Color, 0.14), c.IsBuiltIn)).ToList();
+        _categories = cats.Select(c => new CategoryInfo(c.Id, DisplayName(c), c.Color, Brush(c.Color, 1),
+            Brush(c.Color, ThemeManager.IsDark ? 0.16 : 0.22), c.IsBuiltIn, TextBrush(c.Color))).ToList();
         _categorizer = new Categorizer(Rules.GetAll(), FallbackCategoryId);
         LookupsChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -91,6 +94,16 @@ public sealed class AppServices : IDisposable
     /// <summary>Built-in categories are shown in the UI language; user categories keep their own name.</summary>
     private static string DisplayName(Category c) =>
         c.Key is { } k ? HomeFocus.App.Localization.Loc.T("cat." + k) : c.Name;
+
+    private static SolidColorBrush TextBrush(string hex)
+    {
+        if (ThemeManager.IsDark) return Brush(hex, 1);
+        var c = (Color)ColorConverter.ConvertFromString(hex);
+        const double k = 0.55; // keep 55 % of the color: pastel → readable on white
+        var b = new SolidColorBrush(Color.FromRgb((byte)(c.R * k), (byte)(c.G * k), (byte)(c.B * k)));
+        b.Freeze();
+        return b;
+    }
 
     private static SolidColorBrush Brush(string hex, double alpha)
     {

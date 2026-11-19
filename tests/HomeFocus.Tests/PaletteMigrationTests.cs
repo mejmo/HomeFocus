@@ -23,10 +23,10 @@ public sealed class PaletteMigrationTests : IDisposable
         db.Initialize();
 
         var cats = new CategoryStore(db).GetAll();
-        Assert.Equal("#06B6D4", cats.Single(x => x.Key == "communication").Color); // old teal → electric cyan
-        Assert.Equal("#00A3FF", cats.Single(x => x.Name == "Mine").Color);        // old cyan → sky, not chained
+        Assert.Equal("#2DD4BF", cats.Single(x => x.Key == "communication").Color); // old teal → candy teal
+        Assert.Equal("#38BDF8", cats.Single(x => x.Name == "Mine").Color);        // old cyan → candy sky, never via teal
         Assert.Equal("#123456", cats.Single(x => x.Name == "Picked").Color);      // own color kept
-        Assert.Equal("#2563EB", cats.Single(x => x.Key == "work").Color);
+        Assert.Equal("#60A5FA", cats.Single(x => x.Key == "work").Color);
     }
 
     private static void Exec(SqliteConnection c, string sql)
