@@ -69,6 +69,7 @@ public sealed partial class RulesViewModel : PageViewModel
     [ObservableProperty] private bool _isAddingCategory;
 
     private long? _selected;
+    private bool _hasSelection;
     private bool _suppress;
 
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
@@ -83,6 +84,13 @@ public sealed partial class RulesViewModel : PageViewModel
         _suppress = true;
         var s = AppServices.Instance;
         var rules = _allRules = s.Rules.GetAll();
+        // Start on the first category rather than "All" (~100 rows make the page slow to show and scroll).
+        if (!_hasSelection)
+        {
+            _selected = s.CategoryList.FirstOrDefault()?.Id;
+            _hasSelection = true;
+        }
+        if (_selected is { } sel && s.CategoryList.All(c => c.Id != sel)) _selected = s.CategoryList.FirstOrDefault()?.Id;
         var rows = new List<CategoryFilterRow>
         {
             new(this, null, Loc.T("rules.all"), (Brush)System.Windows.Application.Current.FindResource("Brush.Text"), rules.Count),
