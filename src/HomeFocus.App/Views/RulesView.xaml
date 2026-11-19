@@ -185,20 +185,8 @@
                         <TextBlock Grid.Column="2" Text="{l:T rules.colSource}" Style="{StaticResource Text.Caps}"/>
                     </Grid>
                     <Border Height="1" Background="{DynamicResource Brush.Border}"/>
-                    <!-- ~100 rows, each with a combo box: only the visible ones are created (own scroll area, virtualized). -->
-                    <ItemsControl ItemsSource="{Binding Rules}" MaxHeight="560"
-                                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"
-                                  ScrollViewer.CanContentScroll="True">
-                        <ItemsControl.Template>
-                            <ControlTemplate TargetType="ItemsControl">
-                                <ScrollViewer Focusable="False" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                    <ItemsPresenter/>
-                                </ScrollViewer>
-                            </ControlTemplate>
-                        </ItemsControl.Template>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate><VirtualizingStackPanel/></ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <!-- ~100 rows: each row has a light category button; one shared menu is built only when it is clicked. -->
+                    <ItemsControl ItemsSource="{Binding Rules}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="0,6">
@@ -215,8 +203,16 @@
                                             </Border>
                                             <TextBlock Text="{Binding KindText}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
                                         </StackPanel>
-                                        <ComboBox Grid.Column="1" Margin="0,0,16,0" ItemsSource="{Binding Choices}" SelectedItem="{Binding Category}"
-                                                  ItemTemplate="{StaticResource CategoryChoice}" AutomationProperties.Name="{l:T common.category}"/>
+                                        <Button Grid.Column="1" Margin="0,0,16,0" HorizontalContentAlignment="Stretch" Padding="12,0,10,0"
+                                                Background="{DynamicResource Brush.Input}" Click="CategoryButton_Click"
+                                                AutomationProperties.Name="{l:T common.category}">
+                                            <DockPanel>
+                                                <c:IconView DockPanel.Dock="Right" Data="{StaticResource Icon.ChevronDown}" Width="14" Height="14"
+                                                            Foreground="{DynamicResource Brush.Muted}"/>
+                                                <ContentPresenter Content="{Binding Category}" ContentTemplate="{StaticResource CategoryChoice}"
+                                                                  HorizontalAlignment="Left"/>
+                                            </DockPanel>
+                                        </Button>
                                         <Border Grid.Column="2" Style="{StaticResource Chip}" BorderThickness="1" BorderBrush="{DynamicResource Brush.Border}" HorizontalAlignment="Left">
                                             <TextBlock Text="{Binding Source}" FontSize="12" Foreground="{DynamicResource Brush.Muted}"/>
                                         </Border>
