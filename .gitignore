@@ -7,3 +7,5 @@ TestResults/
 *.db
 *.db-wal
 *.db-shm
+publish/
+dist/
