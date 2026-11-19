@@ -85,6 +85,36 @@ public class WebTrackerTests
     }
 
     [Fact]
+    public void Connected_browser_is_never_recorded_as_an_app()
+    {
+        var state = new BrowserState();
+        var sink = new Sink();
+        var t = new ActivityTracker(new Src(), sink, "pc", state);
+        for (var s = 0; s <= 90; s++)
+        {
+            var now = T0.AddSeconds(s);
+            // new-tab page (no website) for the first minute, then a website
+            state.Report("c1", "chrome.exe", s < 60 ? null : "github.com", true, now);
+            t.Tick(now);
+        }
+        t.Stop(T0.AddSeconds(90));
+
+        Assert.DoesNotContain(sink.Rows.Values, r => r.AppKey == "chrome.exe");
+        var web = Assert.Single(sink.Rows.Values);
+        Assert.Equal(("github.com", ActivityKind.Web), (web.AppKey, web.Kind));
+    }
+
+    [Fact]
+    public void Browser_without_extension_is_still_an_app()
+    {
+        var sink = new Sink();
+        var t = new ActivityTracker(new Src(), sink, "pc", new BrowserState());
+        for (var s = 0; s <= 30; s++) t.Tick(T0.AddSeconds(s));
+        t.Stop(T0.AddSeconds(30));
+        Assert.Equal("chrome.exe", Assert.Single(sink.Rows.Values).AppKey);
+    }
+
+    [Fact]
     public void Without_a_fresh_report_the_browser_is_an_app()
     {
         var state = new BrowserState();

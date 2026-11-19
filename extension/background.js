@@ -36,7 +36,7 @@ function domainOf(url) {
 
 async function currentTab() {
   try {
-    const win = await chrome.windows.getLastFocused();
+    const win = await chrome.windows.getLastFocused({ windowTypes: ['normal', 'popup', 'app'] });
     const [tab] = await chrome.tabs.query({ active: true, windowId: win.id });
     // Private windows are never reported.
     const domain = tab && !tab.incognito ? domainOf(tab.url) : null;

@@ -16,11 +16,15 @@ public interface IBrowserActivity
 {
     /// <summary>The domain in the active tab of the browser whose process is <paramref name="browserAppKey"/>, or null.</summary>
     string? ActiveDomain(string browserAppKey, DateTime nowUtc);
+
+    /// <summary>True while the HomeFocus extension in that browser is connected and reporting.</summary>
+    bool IsConnected(string browserAppKey, DateTime nowUtc);
 }
 
 /// <summary>
 /// Turns periodic samples of the foreground app into activity segments.
-/// When a browser is in front and its extension reports the active tab, the segment is the website instead.
+/// When a browser with a connected extension is in front, time is recorded per website only: the browser itself
+/// is never an "app" then, and pages without a website (new tab, settings) are not counted.
 /// Call <see cref="Tick"/> about once a second; it is not thread-safe.
 /// </summary>
 public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink, string deviceId, IBrowserActivity? browser = null)
@@ -84,8 +88,13 @@ public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink
         var kind = ActivityKind.App;
         var key = fg.AppKey;
         var name = fg.DisplayName;
-        if (browser?.ActiveDomain(fg.AppKey, nowUtc) is { } domain)
+        if (browser is not null && browser.IsConnected(fg.AppKey, nowUtc))
         {
+            if (browser.ActiveDomain(fg.AppKey, nowUtc) is not { } domain)
+            {
+                Close(nowUtc);
+                return;
+            }
             kind = ActivityKind.Web;
             key = name = domain;
         }

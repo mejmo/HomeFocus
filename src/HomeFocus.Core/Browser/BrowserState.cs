@@ -58,6 +58,13 @@ public sealed partial class BrowserState : IBrowserActivity
         lock (_gate) return _byConnection.Values.Select(e => e.BrowserKey).Distinct().ToList();
     }
 
+    public bool IsConnected(string browserAppKey, DateTime nowUtc)
+    {
+        lock (_gate)
+            return _byConnection.Values.Any(e => nowUtc - e.SeenUtc <= Stale &&
+                                                 string.Equals(e.BrowserKey, browserAppKey, StringComparison.OrdinalIgnoreCase));
+    }
+
     public string? ActiveDomain(string browserAppKey, DateTime nowUtc)
     {
         lock (_gate)
