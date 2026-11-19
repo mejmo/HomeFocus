@@ -17,7 +17,7 @@
 <p align="center"><b>Stay in focus while you work from home.</b><br>
 HomeFocus quietly tracks where your time goes on your Windows PC, so you can see when work turns into scrolling.</p>
 
-![HomeFocus – weekly overview by category and app ranking](docs/images/overview-dark.png)
+![HomeFocus – weekly overview by category and app ranking](docs/images/app-overview.png)
 
 ## Why HomeFocus
 
