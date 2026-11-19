@@ -7,10 +7,31 @@
 <meta name="description" content="HomeFocus is a self-hosted Windows time tracker. It shows where your working day goes and never sends anything to the cloud.">
 <link rel="icon" href="images/icon-256.png">
 <style>
-:root{--bg:#F4F5F7;--card:#FFFFFF;--border:#E3E5EA;--text:#16181D;--muted:#5B6270;--accent:#2F5BEA;--accent-soft:#E6ECFD;--ok:#15803D}
-@media (prefers-color-scheme: dark){:root{--bg:#121418;--card:#1B1E24;--border:#2A2E37;--text:#E8EAEE;--muted:#9AA1AE;--accent:#5B8BFF;--accent-soft:#1F2C4D;--ok:#3DD68C}}
+:root{--bg:#F4F5F7;--card:#FFFFFF;--glass:rgba(255,255,255,.72);--border:#E3E5EA;--text:#16181D;--muted:#5B6270;--accent:#2F5BEA;--accent-soft:#E6ECFD;--ok:#15803D;
+  --glow1:rgba(47,91,234,.28);--glow2:rgba(14,143,128,.20);--glow3:rgba(116,82,209,.20);--dot:rgba(22,24,29,.07)}
+@media (prefers-color-scheme: dark){:root{--bg:#0E1014;--card:#1B1E24;--glass:rgba(27,30,36,.72);--border:#2A2E37;--text:#E8EAEE;--muted:#9AA1AE;--accent:#5B8BFF;--accent-soft:#1F2C4D;--ok:#3DD68C;
+  --glow1:rgba(63,116,240,.38);--glow2:rgba(45,212,191,.16);--glow3:rgba(167,139,250,.22);--dot:rgba(255,255,255,.06)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+body{margin:0;color:var(--text);font:16px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;overflow-x:hidden}
+/* the page background lives on <html> so the fixed decorations (z-index:-1) paint above it */
+html{min-height:100%;
+  background:
+    radial-gradient(900px 520px at 12% -6%, var(--glow1), transparent 70%),
+    radial-gradient(760px 480px at 92% 8%, var(--glow3), transparent 70%),
+    radial-gradient(900px 600px at 50% 62%, var(--glow2), transparent 72%),
+    var(--bg)}
+/* dotted grid that fades out towards the bottom of the viewport */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(var(--dot) 1.2px, transparent 1.3px);background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.35) 60%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.35) 60%,transparent 100%)}
+/* two slowly drifting soft light blobs */
+body::after{content:"";position:fixed;z-index:-1;pointer-events:none;width:46vmax;height:46vmax;left:-12vmax;top:30vh;border-radius:50%;
+  background:radial-gradient(circle, var(--glow1), transparent 65%);filter:blur(30px);animation:drift 26s ease-in-out infinite alternate}
+.blob{position:fixed;z-index:-1;pointer-events:none;width:40vmax;height:40vmax;right:-14vmax;top:-6vmax;border-radius:50%;
+  background:radial-gradient(circle, var(--glow3), transparent 65%);filter:blur(30px);animation:drift2 32s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(18vmax,-14vmax) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-16vmax,22vmax) scale(.9)}}
+@media (prefers-reduced-motion: reduce){body::after,.blob{animation:none}}
 a{color:var(--accent)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 header{padding:28px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -25,16 +46,28 @@ nav a:hover{color:var(--text)}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);margin-left:8px}
 .pills{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px;font-size:14px;color:var(--muted)}
 .pills span{border:1px solid var(--border);border-radius:99px;padding:4px 12px;background:var(--card)}
-.shot{margin:36px auto 0;border-radius:14px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(20,24,32,.18);overflow:hidden;max-width:1000px}
-.shot img{display:block;width:100%;height:auto}
+.shot{position:relative;margin:44px auto 0;max-width:1000px}
+.shot::before{content:"";position:absolute;inset:-6% -4% -10%;z-index:-1;border-radius:40px;filter:blur(48px);opacity:.75;
+  background:conic-gradient(from 200deg at 50% 50%, #2F5BEA, #0E8F80, #7452D1, #E07A2E, #2F5BEA)}
+.shot img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(10,14,24,.35)}
+.pills span{backdrop-filter:blur(8px)}
 section{padding:64px 0}
 h2{font:600 30px/1.2 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;margin:0 0 12px}
 .lead{color:var(--muted);max-width:680px;margin:0 0 32px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+.card{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:22px;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--accent)}
+.card h3::before{content:"";display:block;width:28px;height:4px;border-radius:2px;margin-bottom:12px;background:linear-gradient(90deg,#2F5BEA,#7452D1)}
+.card:nth-child(2) h3::before{background:linear-gradient(90deg,#0E8F80,#2F5BEA)}
+.card:nth-child(3) h3::before{background:linear-gradient(90deg,#E07A2E,#C9437A)}
+.card:nth-child(4) h3::before{background:linear-gradient(90deg,#7452D1,#C9437A)}
+.card:nth-child(5) h3::before{background:linear-gradient(90deg,#2F5BEA,#0E8F80)}
+.card:nth-child(6) h3::before{background:linear-gradient(90deg,#C9437A,#E07A2E)}
 .card h3{margin:0 0 6px;font-size:17px}
 .card p{margin:0;color:var(--muted);font-size:15px}
-.privacy{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.privacy{border:1px solid transparent;border-radius:18px;padding:36px;
+  background:linear-gradient(var(--glass),var(--glass)) padding-box,linear-gradient(135deg,#2F5BEA,#0E8F80 45%,#7452D1) border-box;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
 .privacy ul{margin:0;padding:0;list-style:none}
 .privacy li{padding:8px 0 8px 30px;position:relative;border-bottom:1px solid var(--border)}
 .privacy li:last-child{border-bottom:0}
@@ -47,6 +80,7 @@ footer{padding:40px 0;color:var(--muted);font-size:14px;text-align:center;border
 </style>
 </head>
 <body>
+<div class="blob" aria-hidden="true"></div>
 <div class="wrap">
   <header>
     <picture>

@@ -9,3 +9,4 @@ TestResults/
 *.db-shm
 publish/
 dist/
+_site/
