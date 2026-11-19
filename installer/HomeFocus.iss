@@ -4,6 +4,9 @@
 #ifndef AppVersion
   #define AppVersion "0.0.0"
 #endif
+#ifndef AppPublisher
+  #define AppPublisher "HomeFocus"
+#endif
 #ifndef PublishDir
   #define PublishDir "..\publish"
 #endif
@@ -13,7 +16,7 @@ AppId={{6F3C2B1E-8A4D-4C67-9E2F-4B1D7A9C5E10}
 AppName=HomeFocus
 AppVersion={#AppVersion}
 AppVerName=HomeFocus {#AppVersion}
-AppPublisher=HomeFocus
+AppPublisher={#AppPublisher}
 DefaultDirName={localappdata}\Programs\HomeFocus
 DefaultGroupName=HomeFocus
 DisableProgramGroupPage=yes

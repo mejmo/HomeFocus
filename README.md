@@ -49,24 +49,16 @@ Premenná `HOMEFOCUS_DB` presmeruje aplikáciu na inú databázu, napríklad na 
 
 ## Podpisovanie (Azure Artifact Signing)
 
-Podpis zabezpečuje Microsoft **Artifact Signing** (predtým *Trusted Signing*), približne 10 USD mesačne. Workflow potrebuje tri tajné údaje (secrets) a tri bežné premenné (variables).
+Release sa podpisuje existujúcim účtom **Azure Artifact Signing** (ten istý, ktorý používa sf-querynator). Workflow potrebuje:
 
-1. **Signing account**: v [Azure portáli](https://portal.azure.com) vytvorte zdroj *Artifact Signing Account* (napr. región West Europe, SKU Basic). Zapíšte si jeho **názov** a **Account URI**, napr. `https://weu.codesigning.azure.net/`.
-2. **Overenie identity**: v účte otvorte *Identity validations → New* (*Organization* alebo *Individual*) a počkajte na schválenie. Môže to trvať aj niekoľko dní.
-3. **Certificate profile**: *Certificate profiles → Create → Public Trust* a vyberte schválenú identitu. Zapíšte si **názov profilu**.
-4. **App registration**: *Microsoft Entra ID → App registrations → New registration*, napr. `homefocus-signing`.
-   - na stránke *Overview* skopírujte **Application (client) ID** a **Directory (tenant) ID**,
-   - v *Certificates & secrets → New client secret* skopírujte **Value**. Zobrazí sa iba raz.
-5. **Oprávnenie**: v Signing account otvorte *Access control (IAM) → Add role assignment*, zvoľte rolu **Artifact Signing Certificate Profile Signer** (v starších portáloch *Trusted Signing Certificate Profile Signer*) a priraďte ju aplikácii z kroku 4.
-6. **GitHub**: v adresári repozitára spustite tieto príkazy:
+| Typ | Názov | Hodnota |
+|---|---|---|
+| secret | `AZURE_TENANT_ID` | Directory (tenant) ID app registrácie |
+| secret | `AZURE_CLIENT_ID` | Application (client) ID |
+| secret | `AZURE_CLIENT_SECRET` | client secret (Value) |
+| variable | `AZURE_SIGNING_ENDPOINT` | Account URI, napr. `https://eus.codesigning.azure.net/` |
+| variable | `AZURE_SIGNING_ACCOUNT` | názov signing accountu |
+| variable | `AZURE_SIGNING_PROFILE` | názov certificate profile |
+| variable | `AZURE_SIGNING_PUBLISHER` | CN certifikátu, použije sa ako vydavateľ v inštalátore |
 
-   ```powershell
-   gh secret set AZURE_TENANT_ID     # Directory (tenant) ID
-   gh secret set AZURE_CLIENT_ID     # Application (client) ID
-   gh secret set AZURE_CLIENT_SECRET # Value klientského tajomstva
-   gh variable set SIGNING_ENDPOINT --body "https://weu.codesigning.azure.net/"
-   gh variable set SIGNING_ACCOUNT  --body "<názov signing accountu>"
-   gh variable set SIGNING_PROFILE  --body "<názov certificate profile>"
-   ```
-
-Platnosť client secretu je obmedzená (predvolene 6 až 24 mesiacov). Pred jej vypršaním vytvorte nový secret a aktualizujte `AZURE_CLIENT_SECRET`.
+App registrácia musí mať na signing accounte rolu **Artifact Signing Certificate Profile Signer**. Secrets nastavíte cez `gh secret set <NÁZOV>` alebo v *Settings → Secrets and variables → Actions*. Client secret má obmedzenú platnosť, preto ho pred vypršaním obnovte v Entra ID a aktualizujte aj tu.
