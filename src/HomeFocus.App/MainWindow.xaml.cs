@@ -13,6 +13,11 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = vm;
         StateChanged += (_, _) => OnStateChanged();
+        // Every page opens scrolled to the top.
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(MainViewModel.Current) or nameof(MainViewModel.CurrentPage)) Scroller.ScrollToTop();
+        };
         IsVisibleChanged += (_, e) => { if ((bool)e.NewValue) vm.Activate(); };
     }
 
