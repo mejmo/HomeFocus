@@ -1,8 +1,19 @@
 <p align="center"><img src="assets/icon-256.png" width="96" alt="HomeFocus"></p>
 
-# HomeFocus
+<h1 align="center">HomeFocus</h1>
 
-HomeFocus je desktopová aplikácia pre Windows, ktorá automaticky sleduje, koľko času trávite v jednotlivých aplikáciách. Všetky dáta ostávajú v počítači a do cloudu sa nič neposiela.
+<p align="center">
+  <a href="https://github.com/mejmo/HomeFocus/actions/workflows/ci.yml"><img src="https://github.com/mejmo/HomeFocus/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/mejmo/HomeFocus/actions/workflows/release.yml"><img src="https://github.com/mejmo/HomeFocus/actions/workflows/release.yml/badge.svg" alt="Release"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&amp;logoColor=white" alt="Windows 10 | 11">
+  <img src="https://img.shields.io/badge/.NET-9-512BD4?logo=dotnet&amp;logoColor=white" alt=".NET 9">
+  <img src="https://img.shields.io/badge/WPF-desktop-2F5BEA" alt="WPF">
+  <img src="https://img.shields.io/badge/d%C3%A1ta-100%25%20lok%C3%A1lne-16A34A" alt="dáta 100 % lokálne">
+</p>
+
+<p align="center">Desktopová aplikácia pre Windows, ktorá automaticky sleduje, koľko času trávite v jednotlivých aplikáciách. Všetky dáta ostávajú v počítači a do cloudu sa nič neposiela.</p>
+
+![HomeFocus – týždenný prehľad podľa kategórií a rebríček aplikácií](docs/images/screenshot.png)
 
 - **Sledovanie** aktívneho okna každú sekundu, s rozpoznaním nečinnosti (prah sa dá nastaviť), pauzy a uspania PC
 - **Dashboard**: časová os dňa, top aplikácie, kategórie, týždenný a mesačný prehľad, export do CSV
