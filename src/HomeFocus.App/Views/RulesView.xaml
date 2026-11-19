@@ -111,6 +111,14 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
+                    <Button Margin="0,10,0,0" HorizontalAlignment="Stretch" Command="{Binding StartAddCategoryCommand}"
+                            Visibility="{Binding IsAddingCategory, Converter={StaticResource InverseBoolToVis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <c:IconView Data="{StaticResource Icon.Plus}" Width="15" Height="15" Margin="0,0,8,0"/>
+                            <TextBlock Text="{l:T rules.addCategory}"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- Add category -->
                     <Border Margin="0,10,0,0" Padding="12" CornerRadius="10" Background="{DynamicResource Brush.Subtle}"
                             Visibility="{Binding IsAddingCategory, Converter={StaticResource BoolToVis}}">
