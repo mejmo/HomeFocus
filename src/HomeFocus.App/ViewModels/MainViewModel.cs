@@ -81,7 +81,7 @@ public sealed partial class MainViewModel : ObservableObject
             StatusText = Loc.T("status.active");
             NowText = t.Current switch
             {
-                { Kind: ActivityKind.App } c => Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)),
+                { Kind: ActivityKind.App or ActivityKind.Web } c => Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)),
                 { Kind: ActivityKind.Idle } c => Loc.F("status.idle", Format.Duration(c.Duration)),
                 _ => Loc.T("status.waiting"),
             };

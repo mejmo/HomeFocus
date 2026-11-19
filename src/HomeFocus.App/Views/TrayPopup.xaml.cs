@@ -27,7 +27,7 @@ public sealed partial class TrayPopupViewModel : ObservableObject
         Categories = RowBuilder.Categories(d.Categories).Take(4).ToList();
         IsPaused = s.Tracking.IsPaused;
         PillText = IsPaused && s.Tracking.PausedUntilUtc is { } u ? Loc.F("tray.pausedUntil", u.ToLocalTime()) : Loc.T("tray.tracking");
-        NowText = s.Tracking.Current is { Kind: ActivityKind.App } c ? Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)) : "";
+        NowText = s.Tracking.Current is { Kind: ActivityKind.App or ActivityKind.Web } c ? Loc.F("status.now", c.DisplayName, Format.Duration(c.Duration)) : "";
     }
 }
 
