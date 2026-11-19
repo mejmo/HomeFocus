@@ -1,6 +1,9 @@
-<p align="center"><img src="assets/icon-256.png" width="96" alt="HomeFocus"></p>
-
-<h1 align="center">HomeFocus</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-dark.png">
+    <img src="docs/images/logo-light.png" alt="HomeFocus" width="440">
+  </picture>
+</p>
 
 <p align="center">
   <a href="https://github.com/mejmo/HomeFocus/actions/workflows/ci.yml"><img src="https://github.com/mejmo/HomeFocus/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
