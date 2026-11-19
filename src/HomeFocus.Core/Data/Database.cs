@@ -5,7 +5,7 @@ namespace HomeFocus.Core.Data;
 /// <summary>Opens the SQLite file and keeps its schema up to date.</summary>
 public sealed class Database
 {
-    public const int SchemaVersion = 4;
+    public const int SchemaVersion = 5;
 
     private readonly string _connectionString;
 
@@ -60,6 +60,7 @@ public sealed class Database
         if (version < 2) MigrateV2(c);
         if (version < 3) MigrateV3(c);
         if (version < 4) MigrateV4(c);
+        if (version < 5) MigrateV5(c);
     }
 
     private static void CreateV1(SqliteConnection c)
@@ -108,16 +109,16 @@ public sealed class Database
 
         var cats = new (string Key, string Name, string Color, string[] Patterns)[]
         {
-            ("work", "Work", "#3B82F6", ["devenv.exe", "code.exe", "rider64.exe", "idea64.exe", "winword.exe", "excel.exe",
+            ("work", "Work", "#2563EB", ["devenv.exe", "code.exe", "rider64.exe", "idea64.exe", "winword.exe", "excel.exe",
                 "powerpnt.exe", "onenote.exe", "windowsterminal.exe", "wt.exe", "powershell.exe", "pwsh.exe", "cmd.exe",
                 "ssms.exe", "notepad++.exe", "figma.exe", "postman.exe", "github*.exe"]),
-            ("communication", "Communication", "#14B8A6", ["outlook.exe", "olk.exe", "ms-teams.exe", "teams.exe", "slack.exe", "zoom.exe",
+            ("communication", "Communication", "#06B6D4", ["outlook.exe", "olk.exe", "ms-teams.exe", "teams.exe", "slack.exe", "zoom.exe",
                 "thunderbird.exe", "signal.exe", "telegram.exe", "whatsapp*.exe"]),
-            ("entertainment", "Entertainment", "#F97316", ["spotify.exe", "steam.exe", "steamwebhelper.exe", "epicgameslauncher.exe", "vlc.exe",
+            ("entertainment", "Entertainment", "#FF6B00", ["spotify.exe", "steam.exe", "steamwebhelper.exe", "epicgameslauncher.exe", "vlc.exe",
                 "netflix.exe", "battle.net.exe", "leagueclient*.exe", "riotclient*.exe"]),
-            ("social", "Social media", "#EC4899", ["discord.exe", "messenger.exe"]),
-            ("education", "Learning", "#8B5CF6", ["anki.exe", "kindle.exe", "obsidian.exe"]),
-            ("other", "Other", "#94A3B8", []),
+            ("social", "Social media", "#FF2D78", ["discord.exe", "messenger.exe"]),
+            ("education", "Learning", "#7C3AED", ["anki.exe", "kindle.exe", "obsidian.exe"]),
+            ("other", "Other", "#64748B", []),
         };
         for (var i = 0; i < cats.Length; i++)
         {
@@ -176,26 +177,23 @@ public sealed class Database
         tx.Commit();
     }
 
-    /// <summary>v4: livelier category colors (one palette); colors you picked outside the old palette are kept.</summary>
+    /// <summary>v4: vivid "Electric" category palette; colors picked outside the old palette are kept.</summary>
     private static void MigrateV4(SqliteConnection c)
     {
         using var tx = c.BeginTransaction();
-        (string Old, string New)[] map =
-        [
-            ("#2F6FEB", "#3B82F6"),
-            ("#0E8F80", "#14B8A6"),
-            ("#E07A2E", "#F97316"),
-            ("#C9437A", "#EC4899"),
-            ("#7452D1", "#8B5CF6"),
-            ("#3C9A3C", "#22C55E"),
-            ("#C2A21A", "#EAB308"),
-            ("#D9534F", "#EF4444"),
-            ("#1F8FB8", "#06B6D4"),
-            ("#8A919E", "#94A3B8"),
-        ];
-        foreach (var (old, @new) in map)
-            Exec(c, "UPDATE categories SET color = $n WHERE upper(color) = $o;", tx, ("$n", @new), ("$o", old));
+        // one statement, so a new color that equals another old one is never remapped twice
+        Exec(c, "UPDATE categories SET color = CASE upper(color) WHEN '#2F6FEB' THEN '#2563EB' WHEN '#0E8F80' THEN '#06B6D4' WHEN '#E07A2E' THEN '#FF6B00' WHEN '#C9437A' THEN '#FF2D78' WHEN '#7452D1' THEN '#7C3AED' WHEN '#3C9A3C' THEN '#16A34A' WHEN '#C2A21A' THEN '#FFC400' WHEN '#D9534F' THEN '#FF3B30' WHEN '#1F8FB8' THEN '#00A3FF' WHEN '#8A919E' THEN '#64748B' END WHERE upper(color) IN ('#2F6FEB', '#0E8F80', '#E07A2E', '#C9437A', '#7452D1', '#3C9A3C', '#C2A21A', '#D9534F', '#1F8FB8', '#8A919E');", tx);
         Exec(c, "PRAGMA user_version = 4;", tx);
+        tx.Commit();
+    }
+
+    /// <summary>v5: databases that got the first draft of the v4 palette move to "Electric" as well.</summary>
+    private static void MigrateV5(SqliteConnection c)
+    {
+        using var tx = c.BeginTransaction();
+        // #06B6D4 is left out: it is also the new Communication color, so it must not move again.
+        Exec(c, "UPDATE categories SET color = CASE upper(color) WHEN '#3B82F6' THEN '#2563EB' WHEN '#14B8A6' THEN '#06B6D4' WHEN '#F97316' THEN '#FF6B00' WHEN '#EC4899' THEN '#FF2D78' WHEN '#8B5CF6' THEN '#7C3AED' WHEN '#22C55E' THEN '#16A34A' WHEN '#EAB308' THEN '#FFC400' WHEN '#EF4444' THEN '#FF3B30' WHEN '#94A3B8' THEN '#64748B' END WHERE upper(color) IN ('#3B82F6', '#14B8A6', '#F97316', '#EC4899', '#8B5CF6', '#22C55E', '#EAB308', '#EF4444', '#94A3B8');", tx);
+        Exec(c, "PRAGMA user_version = 5;", tx);
         tx.Commit();
     }
 
