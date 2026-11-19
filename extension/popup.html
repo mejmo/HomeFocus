@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HomeFocus</title>
+<style>
+:root{--bg:#FFFFFF;--text:#16181D;--muted:#5B6270;--border:#E3E5EA;--accent:#2F5BEA;--ok:#16A34A;--warn:#D97706;--bad:#DC2626}
+@media (prefers-color-scheme: dark){:root{--bg:#1B1E24;--text:#E8EAEE;--muted:#9AA1AE;--border:#2A2E37;--accent:#5B8BFF;--ok:#3DD68C;--warn:#F5B73B;--bad:#FF6B6B}}
+body{margin:0;width:300px;background:var(--bg);color:var(--text);font:13.5px/1.5 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+.wrap{padding:16px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+header img{width:28px;height:28px}
+header b{font-size:15px}
+.status{display:flex;align-items:center;gap:8px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+p{margin:6px 0 0;color:var(--muted)}
+button{margin-top:14px;min-height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);font:inherit;font-weight:500;cursor:pointer}
+button:hover{border-color:var(--accent)}
+footer{border-top:1px solid var(--border);padding:10px 16px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="icons/32.png" alt=""><b>HomeFocus</b></header>
+  <div class="status"><span class="dot" id="dot"></span><span id="title">…</span></div>
+  <p id="text"></p>
+  <button id="retry" type="button" hidden>Try again</button>
+</div>
+<footer>Only the website's domain goes to the HomeFocus app on this PC. Nothing is sent to the internet.</footer>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -40,12 +40,16 @@
                 </Border>
                 <Border Style="{StaticResource ItemLast}">
                     <DockPanel>
-                        <Border DockPanel.Dock="Right" Style="{StaticResource Chip}" BorderThickness="1" BorderBrush="{DynamicResource Brush.BorderStrong}" Padding="10,4">
-                            <TextBlock Text="{l:T settings.comingSoon}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Muted}"/>
-                        </Border>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="{l:T settings.extGet}" Command="{Binding GetExtensionCommand}" Margin="16,0,0,0"
+                                    Visibility="{Binding HasStoreLink, Converter={StaticResource BoolToVis}}"/>
+                            <Button Content="{l:T settings.extDisconnect}" Command="{Binding DisconnectBrowsersCommand}" Margin="8,0,0,0"
+                                    Style="{StaticResource Button.Danger}" Visibility="{Binding HasPairedBrowsers, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="{l:T settings.webMobile}" Style="{StaticResource ItemTitle}"/>
-                            <TextBlock Text="{l:T settings.webMobileText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                            <TextBlock Text="{l:T settings.ext}" Style="{StaticResource ItemTitle}"/>
+                            <TextBlock Text="{Binding ExtensionStatus}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                            <TextBlock Text="{l:T settings.extText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
                         </StackPanel>
                     </DockPanel>
                 </Border>

@@ -30,6 +30,7 @@ It is **fully self-hosted**. Everything runs and stays on your own computer, and
 - **Automatic tracking** of the active app, once a second, with idle detection (adjustable), pause and sleep handling
 - **Dashboard**: day timeline, top apps, categories, weekly and monthly overview, CSV export
 - **Categories & rules**: apps are sorted by process name (`devenv.exe`, `steam*.exe`); your own rules also apply to past history
+- **Websites**: the HomeFocus browser extension (Chrome, Edge and other Chromium browsers) reports the domain of your active tab, so browser time is split per website. It talks only to the app on `127.0.0.1`; private windows are never reported.
 - **Tray icon**: today at a glance, pause, starts quietly with Windows
 - Light and dark theme following Windows; English and Slovak UI
 
@@ -56,4 +57,5 @@ In Debug builds `HOMEFOCUS_DB` points the app at another database; `HOMEFOCUS_LA
 | `src/HomeFocus.Core` | database, rules, tracking (Win32), reports |
 | `src/HomeFocus.App` | WPF UI: `Themes/` (custom styles), `Views/`, `ViewModels/`, `Controls/` (charts), `Localization/` |
 | `tests/HomeFocus.Tests` | xUnit tests for the core |
+| `extension/` | browser extension (Manifest V3). Load it unpacked from `chrome://extensions` for development |
 | `installer/` | Inno Setup installer |

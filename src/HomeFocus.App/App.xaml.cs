@@ -53,6 +53,7 @@ public partial class App : Application
         ThemeManager.Apply(_services.Settings.Get(SettingKeys.Theme) ?? "system");
         FirstRun();
         _services.Tracking.Start();
+        _services.StartBridge(browser => Dispatcher.InvokeAsync(() => ApproveBrowser(browser)).Task);
 
         var vm = new MainViewModel();
         _window = new MainWindow(vm);
@@ -84,6 +85,14 @@ public partial class App : Application
         AutoStart.Set(true);
 #endif
         s.SetBool(SettingKeys.FirstRunDone, true);
+    }
+
+    /// <summary>Asked once per browser profile when its HomeFocus extension connects for the first time.</summary>
+    private static bool ApproveBrowser(string browser)
+    {
+        var name = browser switch { "edge" => "Microsoft Edge", "brave" => "Brave", "opera" => "Opera", "vivaldi" => "Vivaldi", _ => "Google Chrome" };
+        return MessageDialog.Show(Loc.F("bridge.approveTitle", name), Loc.F("bridge.approveText", name),
+            Loc.T("bridge.allow"), Loc.T("bridge.deny"), topmost: true);
     }
 
     private void ShowMain() => _window?.ShowAndActivate();

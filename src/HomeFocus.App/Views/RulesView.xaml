@@ -196,9 +196,12 @@
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition Width="44"/>
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{DynamicResource Brush.Subtle}" CornerRadius="5" Padding="7,3" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Pattern}" FontFamily="Cascadia Mono, Consolas" FontSize="12.5"/>
-                                        </Border>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Border Background="{DynamicResource Brush.Subtle}" CornerRadius="5" Padding="7,3">
+                                                <TextBlock Text="{Binding Pattern}" FontFamily="Cascadia Mono, Consolas" FontSize="12.5"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding KindText}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                         <ComboBox Grid.Column="1" Margin="0,0,16,0" ItemsSource="{Binding Choices}" SelectedItem="{Binding Category}"
                                                   ItemTemplate="{StaticResource CategoryChoice}" AutomationProperties.Name="{l:T common.category}"/>
                                         <Border Grid.Column="2" Style="{StaticResource Chip}" BorderThickness="1" BorderBrush="{DynamicResource Brush.Border}" HorizontalAlignment="Left">

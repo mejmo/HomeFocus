@@ -5,7 +5,7 @@ namespace HomeFocus.Core.Data;
 /// <summary>Opens the SQLite file and keeps its schema up to date.</summary>
 public sealed class Database
 {
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3;
 
     private readonly string _connectionString;
 
@@ -58,6 +58,7 @@ public sealed class Database
         var version = Convert.ToInt32(Scalar(c, "PRAGMA user_version;"));
         if (version < 1) CreateV1(c);
         if (version < 2) MigrateV2(c);
+        if (version < 3) MigrateV3(c);
     }
 
     private static void CreateV1(SqliteConnection c)
@@ -145,6 +146,32 @@ public sealed class Database
         // "Other" may have been pushed down by user categories; it is the last built-in one.
         Exec(c, "UPDATE categories SET key = 'other' WHERE id = (SELECT id FROM categories WHERE is_builtin = 1 ORDER BY sort_order DESC LIMIT 1);", tx);
         Exec(c, "PRAGMA user_version = 2;", tx);
+        tx.Commit();
+    }
+
+    /// <summary>v3: default rules for websites reported by the browser extension.</summary>
+    private static void MigrateV3(SqliteConnection c)
+    {
+        using var tx = c.BeginTransaction();
+        var web = new (string Key, string[] Domains)[]
+        {
+            ("work", ["docs.google.com", "drive.google.com", "github.com", "gitlab.com", "stackoverflow.com", "atlassian.net",
+                "figma.com", "notion.so", "learn.microsoft.com", "portal.azure.com", "dev.azure.com", "office.com", "sharepoint.com"]),
+            ("communication", ["mail.google.com", "outlook.office.com", "outlook.live.com", "teams.microsoft.com", "slack.com",
+                "web.whatsapp.com", "web.telegram.org", "meet.google.com", "zoom.us"]),
+            ("entertainment", ["youtube.com", "netflix.com", "twitch.tv", "open.spotify.com", "disneyplus.com", "max.com",
+                "primevideo.com", "9gag.com", "imdb.com"]),
+            ("social", ["facebook.com", "instagram.com", "x.com", "twitter.com", "reddit.com", "tiktok.com", "linkedin.com",
+                "messenger.com", "threads.net", "pinterest.com"]),
+            ("education", ["wikipedia.org", "coursera.org", "udemy.com", "khanacademy.org", "edx.org", "duolingo.com"]),
+        };
+        foreach (var (key, domains) in web)
+        {
+            if (Scalar(c, "SELECT id FROM categories WHERE key = $k;", tx, ("$k", key)) is not long cat) continue;
+            foreach (var d in domains)
+                Exec(c, "INSERT INTO rules(pattern, kind, category_id, is_user) VALUES ($p, 'web', $c, 0);", tx, ("$p", d), ("$c", cat));
+        }
+        Exec(c, "PRAGMA user_version = 3;", tx);
         tx.Commit();
     }
 

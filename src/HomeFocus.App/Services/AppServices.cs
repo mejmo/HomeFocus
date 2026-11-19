@@ -1,5 +1,6 @@
 using System.Windows.Media;
 using HomeFocus.Core;
+using HomeFocus.Core.Browser;
 using HomeFocus.Core.Data;
 using HomeFocus.Core.Reports;
 using HomeFocus.Core.Tracking;
@@ -31,7 +32,9 @@ public sealed class AppServices : IDisposable
         DeviceId = Settings.DeviceId();
 
         ReloadLookups();
-        var tracker = new ActivityTracker(new Win32ForegroundSource(), Activities, DeviceId)
+        Browser = new BrowserState();
+        Pairing = new PairingTokens(Settings);
+        var tracker = new ActivityTracker(new Win32ForegroundSource(), Activities, DeviceId, Browser)
         {
             IdleThreshold = TimeSpan.FromMinutes(Settings.GetInt(SettingKeys.IdleMinutes, 3)),
         };
@@ -48,6 +51,19 @@ public sealed class AppServices : IDisposable
     public TrackingService Tracking { get; }
     public ReportService Reports { get; }
     public string DeviceId { get; }
+    public BrowserState Browser { get; }
+    public PairingTokens Pairing { get; }
+    public BrowserBridge? Bridge { get; private set; }
+
+    /// <summary>Extension IDs allowed to connect: the unpacked development build and the Chrome Web Store item.</summary>
+    public static readonly string[] ExtensionIds = [ExtensionInfo.DevId, ExtensionInfo.StoreId];
+
+    /// <summary>Starts the local endpoint for the browser extension; <paramref name="approve"/> asks the user about new browsers.</summary>
+    public void StartBridge(Func<string, Task<bool>> approve)
+    {
+        Bridge = new BrowserBridge(Browser, Pairing, ExtensionIds, approve);
+        Bridge.Start();
+    }
 
     public Categorizer Categorizer => _categorizer!;
     public IReadOnlyList<CategoryInfo> CategoryList => _categories;
@@ -81,7 +97,11 @@ public sealed class AppServices : IDisposable
         return b;
     }
 
-    public void Dispose() => Tracking.Dispose();
+    public void Dispose()
+    {
+        Bridge?.Dispose();
+        Tracking.Dispose();
+    }
 }
 
 public static class SettingKeys

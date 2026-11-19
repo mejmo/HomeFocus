@@ -16,12 +16,12 @@ public static class CsvExporter
         foreach (var r in rows)
         {
             var c = r.Kind == ActivityKind.Idle ? "" :
-                categoryNames.GetValueOrDefault(r.CategoryOverride ?? cat.Resolve(r.AppKey), "");
+                categoryNames.GetValueOrDefault(r.CategoryOverride ?? cat.Resolve(r.Kind, r.AppKey), "");
             w.WriteLine(string.Join(';',
                 r.StartUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
                 r.EndUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
                 ((long)r.Duration.TotalSeconds).ToString(CultureInfo.InvariantCulture),
-                r.Kind == ActivityKind.Idle ? "idle" : "app",
+                r.Kind switch { ActivityKind.Idle => "idle", ActivityKind.Web => "web", _ => "app" },
                 Esc(r.AppKey), Esc(r.DisplayName), Esc(c), Esc(r.DeviceId)));
         }
         return rows.Count;

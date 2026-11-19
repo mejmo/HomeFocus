@@ -21,6 +21,9 @@ public sealed partial class SettingsViewModel : PageViewModel
     [ObservableProperty] private bool _closeToTray;
     [ObservableProperty] private string _dbPath = "";
     [ObservableProperty] private string _dbInfo = "";
+    [ObservableProperty] private string _extensionStatus = "";
+    [ObservableProperty] private bool _hasPairedBrowsers;
+    public bool HasStoreLink => ExtensionInfo.StoreUrl.Length > 0;
 
     private bool _loading;
 
@@ -37,6 +40,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         var size = new FileInfo(s.Db.Path).Exists ? new FileInfo(s.Db.Path).Length : 0;
         if (File.Exists(s.Db.Path + "-wal")) size += new FileInfo(s.Db.Path + "-wal").Length;
         DbInfo = Loc.F("settings.dbInfo", size / 1024.0 / 1024.0);
+        RefreshExtension();
         _loading = false;
     }
 
@@ -65,6 +69,37 @@ public sealed partial class SettingsViewModel : PageViewModel
     partial void OnCloseToTrayChanged(bool value)
     {
         if (!_loading) AppServices.Instance.Settings.SetBool(SettingKeys.CloseToTray, value);
+    }
+
+    public override void OnTimer() => RefreshExtension();
+
+    private void RefreshExtension()
+    {
+        var s = AppServices.Instance;
+        var connected = s.Browser.ConnectedBrowsers();
+        HasPairedBrowsers = s.Pairing.Count > 0;
+        ExtensionStatus = s.Bridge is not { IsListening: true } ? Loc.T("settings.extPortBusy")
+            : connected.Count > 0 ? Loc.F("settings.extConnected", string.Join(", ", connected.Select(BrowserName)))
+            : HasPairedBrowsers ? Loc.T("settings.extPairedOffline")
+            : Loc.T("settings.extNone");
+    }
+
+    private static string BrowserName(string process) => process switch
+    {
+        "msedge.exe" => "Edge", "brave.exe" => "Brave", "opera.exe" => "Opera", "vivaldi.exe" => "Vivaldi", _ => "Chrome",
+    };
+
+    [RelayCommand]
+    private void GetExtension() => Process.Start(new ProcessStartInfo(ExtensionInfo.StoreUrl) { UseShellExecute = true });
+
+    [RelayCommand]
+    private void DisconnectBrowsers()
+    {
+        if (!MessageDialog.Show(Loc.T("settings.extDisconnectTitle"), Loc.T("settings.extDisconnectText"),
+                Loc.T("settings.extDisconnect"), Loc.T("common.cancel")))
+            return;
+        AppServices.Instance.Pairing.RevokeAll();
+        RefreshExtension();
     }
 
     [RelayCommand]

@@ -129,7 +129,11 @@
                                             <ColumnDefinition Width="60"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{Binding Rank}" Foreground="{DynamicResource Brush.Muted}"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" ToolTip="{Binding AppKey}"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" ToolTip="{Binding AppKey}"/>
+                                            <TextBlock Text="{l:T rules.kindWeb}" Foreground="{DynamicResource Brush.Muted}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                       Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"/>
+                                        </StackPanel>
                                         <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{Binding Tint}" HorizontalAlignment="Left">
                                             <TextBlock Text="{Binding Category}" Foreground="{Binding Brush}" FontSize="11.5" FontWeight="SemiBold"/>
                                         </Border>

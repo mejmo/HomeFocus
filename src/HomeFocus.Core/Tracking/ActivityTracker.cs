@@ -11,11 +11,19 @@ public interface IForegroundSource
     TimeSpan GetIdleTime();
 }
 
+/// <summary>What the browser extension reports for the browser that is in the foreground.</summary>
+public interface IBrowserActivity
+{
+    /// <summary>The domain in the active tab of the browser whose process is <paramref name="browserAppKey"/>, or null.</summary>
+    string? ActiveDomain(string browserAppKey, DateTime nowUtc);
+}
+
 /// <summary>
 /// Turns periodic samples of the foreground app into activity segments.
+/// When a browser is in front and its extension reports the active tab, the segment is the website instead.
 /// Call <see cref="Tick"/> about once a second; it is not thread-safe.
 /// </summary>
-public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink, string deviceId)
+public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink, string deviceId, IBrowserActivity? browser = null)
 {
     /// <summary>Segments shorter than this are dropped (alt-tab flicker).</summary>
     public static readonly TimeSpan MinSegment = TimeSpan.FromSeconds(2);
@@ -73,14 +81,23 @@ public sealed class ActivityTracker(IForegroundSource source, IActivitySink sink
             return;
         }
 
-        if (_current is { Kind: ActivityKind.App } cur && string.Equals(cur.AppKey, fg.AppKey, StringComparison.OrdinalIgnoreCase))
+        var kind = ActivityKind.App;
+        var key = fg.AppKey;
+        var name = fg.DisplayName;
+        if (browser?.ActiveDomain(fg.AppKey, nowUtc) is { } domain)
+        {
+            kind = ActivityKind.Web;
+            key = name = domain;
+        }
+
+        if (_current is { } cur && cur.Kind == kind && string.Equals(cur.AppKey, key, StringComparison.OrdinalIgnoreCase))
         {
             Extend(nowUtc);
             return;
         }
 
         Close(nowUtc);
-        Start(ActivityKind.App, fg.AppKey, fg.DisplayName, nowUtc, nowUtc);
+        Start(kind, key, name, nowUtc, nowUtc);
     }
 
     /// <summary>Ends the open segment (e.g. on shutdown).</summary>

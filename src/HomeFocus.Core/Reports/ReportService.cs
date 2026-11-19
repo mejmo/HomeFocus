@@ -2,7 +2,7 @@ using HomeFocus.Core.Data;
 
 namespace HomeFocus.Core.Reports;
 
-public sealed record AppTotal(string AppKey, string DisplayName, long CategoryId, TimeSpan Duration);
+public sealed record AppTotal(string AppKey, string DisplayName, long CategoryId, TimeSpan Duration, ActivityKind Kind = ActivityKind.App);
 
 public sealed record CategoryTotal(long CategoryId, TimeSpan Duration);
 
@@ -45,7 +45,7 @@ public sealed class ReportService(ActivityStore store, Func<Categorizer> categor
             var s = Max(r.StartUtc, from);
             var e = Min(r.EndUtc, to);
             if (e <= s) continue;
-            long? c = r.Kind == ActivityKind.Idle ? null : r.CategoryOverride ?? cat.Resolve(r.AppKey);
+            long? c = r.Kind == ActivityKind.Idle ? null : r.CategoryOverride ?? cat.Resolve(r.Kind, r.AppKey);
             timeline.Add(new TimelineSegment(s.ToLocalTime(), e.ToLocalTime(), c, r.DisplayName));
         }
 
@@ -80,7 +80,7 @@ public sealed class ReportService(ActivityStore store, Func<Categorizer> categor
         var (from, to) = Bounds(fromDay, toDayExclusive);
         var cat = categorizer();
         return AppTotals(Load(from, to), from, to, cat, null)
-            .Where(a => cat.TryMatch(a.AppKey) is null)
+            .Where(a => cat.TryMatch(a.Kind, a.AppKey) is null)
             .ToList();
     }
 
@@ -97,17 +97,18 @@ public sealed class ReportService(ActivityStore store, Func<Categorizer> categor
 
     private static List<AppTotal> AppTotals(List<ActivityRecord> records, DateTime from, DateTime to, Categorizer cat, long? filter)
     {
-        var map = new Dictionary<string, (string Name, long Cat, long Ticks)>(StringComparer.OrdinalIgnoreCase);
+        var map = new Dictionary<(ActivityKind, string), (string Name, long Cat, long Ticks)>();
         foreach (var r in records)
         {
-            if (r.Kind != ActivityKind.App) continue;
+            if (r.Kind == ActivityKind.Idle) continue;
             var t = Clip(r, from, to).Ticks;
             if (t <= 0) continue;
-            var c = r.CategoryOverride ?? cat.Resolve(r.AppKey);
+            var c = r.CategoryOverride ?? cat.Resolve(r.Kind, r.AppKey);
             if (filter is { } f && c != f) continue;
-            map[r.AppKey] = map.TryGetValue(r.AppKey, out var cur) ? (r.DisplayName, cur.Cat, cur.Ticks + t) : (r.DisplayName, c, t);
+            var k = (r.Kind, r.AppKey.ToLowerInvariant());
+            map[k] = map.TryGetValue(k, out var cur) ? (r.DisplayName, cur.Cat, cur.Ticks + t) : (r.DisplayName, c, t);
         }
-        return map.Select(kv => new AppTotal(kv.Key, kv.Value.Name, kv.Value.Cat, TimeSpan.FromTicks(kv.Value.Ticks)))
+        return map.Select(kv => new AppTotal(kv.Key.Item2, kv.Value.Name, kv.Value.Cat, TimeSpan.FromTicks(kv.Value.Ticks), kv.Key.Item1))
             .OrderByDescending(a => a.Duration).ToList();
     }
 

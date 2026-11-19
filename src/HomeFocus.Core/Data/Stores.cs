@@ -58,8 +58,8 @@ public sealed class ActivityStore(Database db) : IActivitySink
 
     public static long ToMs(DateTime utc) => new DateTimeOffset(DateTime.SpecifyKind(utc, DateTimeKind.Utc)).ToUnixTimeMilliseconds();
     public static DateTime FromMs(long ms) => DateTimeOffset.FromUnixTimeMilliseconds(ms).UtcDateTime;
-    private static string KindToText(ActivityKind k) => k == ActivityKind.Idle ? "idle" : "app";
-    private static ActivityKind TextToKind(string s) => s == "idle" ? ActivityKind.Idle : ActivityKind.App;
+    internal static string KindToText(ActivityKind k) => k switch { ActivityKind.Idle => "idle", ActivityKind.Web => "web", _ => "app" };
+    internal static ActivityKind TextToKind(string s) => s switch { "idle" => ActivityKind.Idle, "web" => ActivityKind.Web, _ => ActivityKind.App };
 }
 
 public sealed class CategoryStore(Database db)
@@ -111,24 +111,26 @@ public sealed class RuleStore(Database db)
     {
         using var c = db.Open();
         using var cmd = c.CreateCommand();
-        cmd.CommandText = "SELECT id, pattern, category_id, is_user FROM rules WHERE kind = 'app' ORDER BY pattern;";
+        cmd.CommandText = "SELECT id, pattern, category_id, is_user, kind FROM rules ORDER BY kind, pattern;";
         using var rd = cmd.ExecuteReader();
         var list = new List<Rule>();
-        while (rd.Read()) list.Add(new Rule(rd.GetInt64(0), rd.GetString(1), rd.GetInt64(2), rd.GetInt64(3) != 0));
+        while (rd.Read())
+            list.Add(new Rule(rd.GetInt64(0), rd.GetString(1), rd.GetInt64(2), rd.GetInt64(3) != 0, ActivityStore.TextToKind(rd.GetString(4))));
         return list;
     }
 
     /// <summary>Adds a user rule, or re-points an existing rule with the same pattern.</summary>
-    public void Set(string pattern, long categoryId)
+    public void Set(string pattern, long categoryId, ActivityKind kind = ActivityKind.App)
     {
         pattern = pattern.Trim().ToLowerInvariant();
+        var k = kind == ActivityKind.Web ? "web" : "app";
         using var c = db.Open();
-        var existing = Database.Scalar(c, "SELECT id FROM rules WHERE pattern = $p AND kind = 'app';", null, ("$p", pattern));
+        var existing = Database.Scalar(c, "SELECT id FROM rules WHERE pattern = $p AND kind = $k;", null, ("$p", pattern), ("$k", k));
         if (existing is long id)
             Database.Exec(c, "UPDATE rules SET category_id = $c, is_user = 1 WHERE id = $id;", null, ("$c", categoryId), ("$id", id));
         else
-            Database.Exec(c, "INSERT INTO rules(pattern, kind, category_id, is_user) VALUES ($p, 'app', $c, 1);", null,
-                ("$p", pattern), ("$c", categoryId));
+            Database.Exec(c, "INSERT INTO rules(pattern, kind, category_id, is_user) VALUES ($p, $k, $c, 1);", null,
+                ("$p", pattern), ("$k", k), ("$c", categoryId));
     }
 
     public void Delete(long id)

@@ -7,6 +7,10 @@
 #ifndef AppPublisher
   #define AppPublisher "HomeFocus"
 #endif
+; Chrome Web Store ID of the HomeFocus extension (same as ExtensionInfo.StoreId). Empty = not offered yet.
+#ifndef ExtensionStoreId
+  #define ExtensionStoreId ""
+#endif
 #ifndef PublishDir
   #define PublishDir "..\publish"
 #endif
@@ -63,6 +67,14 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
   ValueData: """{app}\HomeFocus.exe"" --minimized"; Tasks: autostart
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName: "HomeFocus"; \
   ValueType: none; Flags: uninsdeletevalue dontcreatekey
+
+#if ExtensionStoreId != ""
+; Offers the extension to Chrome and Edge: on their next start they ask the user to enable it.
+Root: HKCU; Subkey: "Software\Google\Chrome\Extensions\{#ExtensionStoreId}"; ValueType: string; ValueName: "update_url"; \
+  ValueData: "https://clients2.google.com/service/update2/crx"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Microsoft\Edge\Extensions\{#ExtensionStoreId}"; ValueType: string; ValueName: "update_url"; \
+  ValueData: "https://clients2.google.com/service/update2/crx"; Flags: uninsdeletekey
+#endif
 
 [Run]
 Filename: "{app}\HomeFocus.exe"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall skipifsilent

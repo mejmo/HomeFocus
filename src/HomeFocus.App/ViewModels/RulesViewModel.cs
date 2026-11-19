@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using HomeFocus.App.Localization;
 using HomeFocus.App.Services;
 using HomeFocus.App.Views;
+using HomeFocus.Core;
 
 namespace HomeFocus.App.ViewModels;
 
@@ -22,30 +23,33 @@ public sealed partial class CategoryFilterRow(RulesViewModel owner, CategoryInfo
     [RelayCommand] private void Delete() => owner.DeleteCategory(this);
 }
 
-public sealed partial class RuleRow(RulesViewModel owner, long id, string pattern, CategoryInfo category, bool isUser) : ObservableObject
+public sealed partial class RuleRow(RulesViewModel owner, long id, string pattern, CategoryInfo category, bool isUser, ActivityKind kind) : ObservableObject
 {
     public long Id { get; } = id;
     public string Pattern { get; } = pattern;
+    public ActivityKind Kind { get; } = kind;
+    public string KindText => Loc.T(Kind == ActivityKind.Web ? "rules.kindWeb" : "rules.kindApp");
     public string Source => Loc.T(isUser ? "rules.user" : "rules.default");
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
 
     [ObservableProperty] private CategoryInfo _category = category;
 
-    partial void OnCategoryChanged(CategoryInfo value) => owner.SetRule(Pattern, value);
+    partial void OnCategoryChanged(CategoryInfo value) => owner.SetRule(Pattern, value, Kind);
 
     [RelayCommand] private void Delete() => owner.DeleteRule(this);
 }
 
-public sealed partial class UncategorizedRow(RulesViewModel owner, string appKey, string name, string time) : ObservableObject
+public sealed partial class UncategorizedRow(RulesViewModel owner, string appKey, string name, string time, ActivityKind kind) : ObservableObject
 {
     public string AppKey { get; } = appKey;
+    public ActivityKind Kind { get; } = kind;
     public string Name { get; } = name;
     public string Time { get; } = time;
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
 
     [ObservableProperty] private CategoryInfo? _category;
 
-    partial void OnCategoryChanged(CategoryInfo? value) { if (value is not null) owner.SetRule(AppKey, value); }
+    partial void OnCategoryChanged(CategoryInfo? value) { if (value is not null) owner.SetRule(AppKey, value, Kind); }
 }
 
 public sealed partial class RulesViewModel : PageViewModel
@@ -89,7 +93,7 @@ public sealed partial class RulesViewModel : PageViewModel
 
         var today = DateOnly.FromDateTime(DateTime.Now);
         Uncategorized = s.Reports.GetUncategorized(today.AddDays(-6), today.AddDays(1))
-            .Take(8).Select(a => new UncategorizedRow(this, a.AppKey, a.DisplayName, Loc.F("rules.last7", Format.Duration(a.Duration)))).ToList();
+            .Take(8).Select(a => new UncategorizedRow(this, a.AppKey, a.DisplayName, Loc.F("rules.last7", Format.Duration(a.Duration)), a.Kind)).ToList();
         _suppress = false;
         LoadRules();
     }
@@ -102,7 +106,7 @@ public sealed partial class RulesViewModel : PageViewModel
         Rules = s.Rules.GetAll()
             .Where(r => _selected is null || r.CategoryId == _selected)
             .Where(r => q.Length == 0 || r.Pattern.Contains(q, StringComparison.OrdinalIgnoreCase))
-            .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser)).ToList();
+            .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser, r.Kind)).ToList();
         RulesTitle = Loc.F("rules.rulesFor", _selected is { } id ? s.Category(id).Name : Loc.T("rules.all"));
         _suppress = false;
     }
@@ -115,10 +119,10 @@ public sealed partial class RulesViewModel : PageViewModel
         LoadRules();
     }
 
-    internal void SetRule(string pattern, CategoryInfo category)
+    internal void SetRule(string pattern, CategoryInfo category, ActivityKind kind)
     {
         if (_suppress) return;
-        AppServices.Instance.Rules.Set(pattern, category.Id);
+        AppServices.Instance.Rules.Set(pattern, category.Id, kind);
         AppServices.Instance.ReloadLookups();
         Refresh();
     }
@@ -148,8 +152,15 @@ public sealed partial class RulesViewModel : PageViewModel
     {
         var p = NewPattern.Trim();
         if (p.Length == 0 || NewPatternCategory is null) return;
+        // "figma" or "steam*.exe" is an app; anything else with a dot ("youtube.com") is a website.
         if (!p.Contains('.') && !p.EndsWith('*')) p += ".exe";
-        AppServices.Instance.Rules.Set(p, NewPatternCategory.Id);
+        var kind = p.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? ActivityKind.App : ActivityKind.Web;
+        if (kind == ActivityKind.Web)
+        {
+            p = p.Replace("https://", "").Replace("http://", "").Split('/')[0];
+            if (p.StartsWith("www.")) p = p[4..];
+        }
+        AppServices.Instance.Rules.Set(p, NewPatternCategory.Id, kind);
         NewPattern = "";
         AppServices.Instance.ReloadLookups();
         Refresh();

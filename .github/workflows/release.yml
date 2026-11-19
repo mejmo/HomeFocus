@@ -99,14 +99,29 @@ jobs:
             if ($s.Status -ne 'Valid') { throw "$f is not validly signed" }
           }
 
+      - name: Package browser extension
+        shell: pwsh
+        run: |
+          # Chrome Web Store upload: version from the tag, no development "key".
+          $v = "${{ steps.version.outputs.version }}"
+          New-Item -ItemType Directory -Force dist\extension | Out-Null
+          Copy-Item extension\* dist\extension -Recurse
+          $m = Get-Content dist\extension\manifest.json -Raw | ConvertFrom-Json
+          $m.PSObject.Properties.Remove('key')
+          $m.version = $v
+          $m | ConvertTo-Json -Depth 10 | Set-Content dist\extension\manifest.json -Encoding utf8
+          Compress-Archive -Path dist\extension\* -DestinationPath "dist\HomeFocus-extension-$v.zip"
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: HomeFocus-Setup-${{ steps.version.outputs.version }}
-          path: dist/*.exe
+          path: |
+            dist/*.exe
+            dist/*.zip
 
       - name: GitHub release
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
-        run: gh release create $env:GITHUB_REF_NAME "dist\HomeFocus-Setup-${{ steps.version.outputs.version }}.exe" --title "HomeFocus ${{ steps.version.outputs.version }}" --generate-notes
+        run: gh release create $env:GITHUB_REF_NAME "dist\HomeFocus-Setup-${{ steps.version.outputs.version }}.exe" "dist\HomeFocus-extension-${{ steps.version.outputs.version }}.zip" --title "HomeFocus ${{ steps.version.outputs.version }}" --generate-notes
