@@ -42,7 +42,8 @@
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                             <Button Content="{l:T settings.extGet}" Command="{Binding GetExtensionCommand}" Margin="16,0,0,0"
-                                    Visibility="{Binding HasStoreLink, Converter={StaticResource BoolToVis}}"/>
+                                    Style="{StaticResource Button.Primary}"
+                                    Visibility="{Binding ShowEnableWeb, Converter={StaticResource BoolToVis}}"/>
                             <Button Content="{l:T settings.extDisconnect}" Command="{Binding DisconnectBrowsersCommand}" Margin="8,0,0,0"
                                     Style="{StaticResource Button.Danger}" Visibility="{Binding HasPairedBrowsers, Converter={StaticResource BoolToVis}}"/>
                         </StackPanel>
@@ -50,6 +51,60 @@
                             <TextBlock Text="{l:T settings.ext}" Style="{StaticResource ItemTitle}"/>
                             <TextBlock Text="{Binding ExtensionStatus}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
                             <TextBlock Text="{l:T settings.extText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="{l:T ai.section}" Style="{StaticResource Section}"/>
+        <Border Style="{StaticResource Card}" Padding="20,4" Margin="0,0,0,24">
+            <StackPanel>
+                <Border Style="{StaticResource Item}">
+                    <DockPanel>
+                        <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}" IsChecked="{Binding AiEnabled}" VerticalAlignment="Center"
+                                  AutomationProperties.Name="{l:T ai.enable}"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{l:T ai.enable}" Style="{StaticResource ItemTitle}"/>
+                            <TextBlock Text="{l:T ai.enableText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <Border Style="{StaticResource Item}">
+                    <DockPanel>
+                        <TextBox DockPanel.Dock="Right" Width="300" Text="{Binding AiPosition, UpdateSourceTrigger=PropertyChanged, Delay=600}"
+                                 Tag="{l:T ai.positionHint}" AutomationProperties.Name="{l:T ai.position}" VerticalAlignment="Center"/>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                            <TextBlock Text="{l:T ai.position}" Style="{StaticResource ItemTitle}"/>
+                            <TextBlock Text="{l:T ai.positionText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <Border Style="{StaticResource Item}">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBox Width="220" Text="{Binding AiUrl, UpdateSourceTrigger=PropertyChanged, Delay=600}"
+                                     AutomationProperties.Name="{l:T ai.server}"/>
+                            <Button Content="{l:T ai.connect}" Command="{Binding AiConnectCommand}" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                            <TextBlock Text="{l:T ai.server}" Style="{StaticResource ItemTitle}"/>
+                            <TextBlock Text="{l:T ai.serverText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                            <TextBlock Text="{l:T ai.remoteWarning}" Foreground="{DynamicResource Brush.WarnText}" FontSize="12.5" Margin="0,4,0,0"
+                                       TextWrapping="Wrap" Visibility="{Binding AiRemoteWarning, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <Border Style="{StaticResource ItemLast}">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ComboBox Width="220" ItemsSource="{Binding AiModels}" SelectedItem="{Binding AiModel}" Tag="{l:T ai.pickModel}"
+                                      AutomationProperties.Name="{l:T ai.model}"/>
+                            <Button Content="{l:T ai.runNow}" Command="{Binding AiRunNowCommand}" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                            <TextBlock Text="{l:T ai.model}" Style="{StaticResource ItemTitle}"/>
+                            <TextBlock Text="{Binding AiStatus}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
                         </StackPanel>
                     </DockPanel>
                 </Border>

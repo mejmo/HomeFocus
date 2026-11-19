@@ -29,10 +29,20 @@ public sealed partial class TodayViewModel : PageViewModel
     [ObservableProperty] private IReadOnlyList<LegendItem> _legend = [];
     [ObservableProperty] private bool _isEmpty;
     [ObservableProperty] private bool _canGoNext;
+    [ObservableProperty] private bool _showWebBanner;
 
     private static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
 
     partial void OnDayChanged(DateOnly value) => Refresh();
+
+    [RelayCommand] private void EnableWebTracking() => WebTracking.OpenStore();
+
+    [RelayCommand]
+    private void DismissWebBanner()
+    {
+        AppServices.Instance.Settings.SetBool(SettingKeys.HideWebBanner, true);
+        ShowWebBanner = false;
+    }
 
     [RelayCommand] private void PrevDay() => Day = Day.AddDays(-1);
     [RelayCommand] private void NextDay() { if (Day < Today) Day = Day.AddDays(1); }
@@ -41,6 +51,7 @@ public sealed partial class TodayViewModel : PageViewModel
     public override void Refresh()
     {
         var s = AppServices.Instance;
+        ShowWebBanner = WebTracking.ShouldOffer();
         var d = s.Reports.GetDay(Day);
         var prev = s.Reports.GetDay(Day.AddDays(-1));
         var isToday = Day == Today;

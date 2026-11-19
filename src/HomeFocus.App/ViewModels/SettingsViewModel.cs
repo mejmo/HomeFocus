@@ -24,6 +24,17 @@ public sealed partial class SettingsViewModel : PageViewModel
     [ObservableProperty] private string _extensionStatus = "";
     [ObservableProperty] private bool _hasPairedBrowsers;
     public bool HasStoreLink => ExtensionInfo.StoreUrl.Length > 0;
+    [ObservableProperty] private bool _showEnableWeb;
+
+    // Automatic categories with a local Ollama model
+    [ObservableProperty] private bool _aiEnabled;
+    [ObservableProperty] private string _aiPosition = "";
+    [ObservableProperty] private string _aiUrl = "";
+    [ObservableProperty] private IReadOnlyList<string> _aiModels = [];
+    [ObservableProperty] private string? _aiModel;
+    [ObservableProperty] private string _aiStatus = "";
+    [ObservableProperty] private bool _aiBusy;
+    [ObservableProperty] private bool _aiRemoteWarning;
 
     private bool _loading;
 
@@ -41,6 +52,14 @@ public sealed partial class SettingsViewModel : PageViewModel
         if (File.Exists(s.Db.Path + "-wal")) size += new FileInfo(s.Db.Path + "-wal").Length;
         DbInfo = Loc.F("settings.dbInfo", size / 1024.0 / 1024.0);
         RefreshExtension();
+        AiEnabled = s.Settings.GetBool(SettingKeys.AiEnabled, false);
+        AiPosition = s.Settings.Get(SettingKeys.AiPosition) ?? "";
+        AiUrl = AiService.Url;
+        AiModel = s.Settings.Get(SettingKeys.AiModel);
+        if (AiModel is { Length: > 0 } && !AiModels.Contains(AiModel)) AiModels = [AiModel];
+        AiRemoteWarning = !Core.Ai.OllamaClient.IsLocal(AiUrl);
+        AiStatus = s.Ai?.Status ?? "";
+        if (s.Ai is { } ai) { ai.StatusChanged -= OnAiStatus; ai.StatusChanged += OnAiStatus; }
         _loading = false;
     }
 
@@ -78,6 +97,7 @@ public sealed partial class SettingsViewModel : PageViewModel
         var s = AppServices.Instance;
         var connected = s.Browser.ConnectedBrowsers();
         HasPairedBrowsers = s.Pairing.Count > 0;
+        ShowEnableWeb = HasStoreLink && !HasPairedBrowsers;
         ExtensionStatus = s.Bridge is not { IsListening: true } ? Loc.T("settings.extPortBusy")
             : connected.Count > 0 ? Loc.F("settings.extConnected", string.Join(", ", connected.Select(BrowserName)))
             : HasPairedBrowsers ? Loc.T("settings.extPairedOffline")
@@ -90,7 +110,7 @@ public sealed partial class SettingsViewModel : PageViewModel
     };
 
     [RelayCommand]
-    private void GetExtension() => Process.Start(new ProcessStartInfo(ExtensionInfo.StoreUrl) { UseShellExecute = true });
+    private void GetExtension() => WebTracking.OpenStore();
 
     [RelayCommand]
     private void DisconnectBrowsers()
@@ -100,6 +120,59 @@ public sealed partial class SettingsViewModel : PageViewModel
             return;
         AppServices.Instance.Pairing.RevokeAll();
         RefreshExtension();
+    }
+
+    private void OnAiStatus(object? sender, EventArgs e) =>
+        System.Windows.Application.Current.Dispatcher.BeginInvoke(() => AiStatus = AppServices.Instance.Ai?.Status ?? "");
+
+    partial void OnAiEnabledChanged(bool value) { if (!_loading) AppServices.Instance.Settings.SetBool(SettingKeys.AiEnabled, value); }
+    partial void OnAiPositionChanged(string value) { if (!_loading) AppServices.Instance.Settings.Set(SettingKeys.AiPosition, value.Trim()); }
+    partial void OnAiModelChanged(string? value) { if (!_loading && value is not null) AppServices.Instance.Settings.Set(SettingKeys.AiModel, value); }
+
+    partial void OnAiUrlChanged(string value)
+    {
+        AiRemoteWarning = !Core.Ai.OllamaClient.IsLocal(value);
+        if (!_loading) AppServices.Instance.Settings.Set(SettingKeys.AiUrl, value.Trim());
+    }
+
+    /// <summary>Checks the Ollama server and fills the model list.</summary>
+    [RelayCommand]
+    private async Task AiConnect()
+    {
+        if (AppServices.Instance.Ai is not { } ai) return;
+        AiBusy = true;
+        try
+        {
+            var models = await ai.ListModelsAsync(AiUrl);
+            var keep = AiModel;
+            AiModels = models;
+            AiModel = models.Contains(keep ?? "") ? keep : models.FirstOrDefault();
+            AiStatus = models.Count > 0 ? Loc.F("ai.connected", models.Count) : Loc.T("ai.noModels");
+        }
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or TaskCanceledException or ArgumentException)
+        {
+            AiStatus = Loc.F("ai.statusError", ex.Message);
+        }
+        finally
+        {
+            AiBusy = false;
+        }
+    }
+
+    /// <summary>Categorizes uncategorized apps and websites right away.</summary>
+    [RelayCommand]
+    private async Task AiRunNow()
+    {
+        if (AppServices.Instance.Ai is not { } ai) return;
+        if (!AiService.IsConfigured(out _, out _))
+        {
+            AiStatus = Loc.T("ai.needSetup");
+            return;
+        }
+        AiBusy = true;
+        AiStatus = Loc.T("ai.running");
+        try { await ai.RunAsync(); }
+        finally { AiBusy = false; }
     }
 
     [RelayCommand]

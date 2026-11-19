@@ -115,7 +115,9 @@ public sealed class RuleStore(Database db)
         using var rd = cmd.ExecuteReader();
         var list = new List<Rule>();
         while (rd.Read())
-            list.Add(new Rule(rd.GetInt64(0), rd.GetString(1), rd.GetInt64(2), rd.GetInt64(3) != 0, ActivityStore.TextToKind(rd.GetString(4))));
+            // is_user: 0 = built-in, 1 = yours, 2 = suggested by the AI categorizer
+            list.Add(new Rule(rd.GetInt64(0), rd.GetString(1), rd.GetInt64(2), rd.GetInt64(3) == 1, ActivityStore.TextToKind(rd.GetString(4)),
+                rd.GetInt64(3) == 2));
         return list;
     }
 
@@ -131,6 +133,17 @@ public sealed class RuleStore(Database db)
         else
             Database.Exec(c, "INSERT INTO rules(pattern, kind, category_id, is_user) VALUES ($p, $k, $c, 1);", null,
                 ("$p", pattern), ("$k", k), ("$c", categoryId));
+    }
+
+    /// <summary>Adds an AI-suggested rule unless a rule for the same pattern already exists.</summary>
+    public void SetAi(string pattern, long categoryId, ActivityKind kind)
+    {
+        pattern = pattern.Trim().ToLowerInvariant();
+        var k = kind == ActivityKind.Web ? "web" : "app";
+        using var c = db.Open();
+        if (Database.Scalar(c, "SELECT id FROM rules WHERE pattern = $p AND kind = $k;", null, ("$p", pattern), ("$k", k)) is long) return;
+        Database.Exec(c, "INSERT INTO rules(pattern, kind, category_id, is_user) VALUES ($p, $k, $c, 2);", null,
+            ("$p", pattern), ("$k", k), ("$c", categoryId));
     }
 
     public void Delete(long id)

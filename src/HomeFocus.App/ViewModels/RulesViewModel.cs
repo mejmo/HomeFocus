@@ -24,7 +24,7 @@ public sealed partial class CategoryFilterRow(RulesViewModel owner, CategoryInfo
 }
 
 public sealed partial class RuleRow(RulesViewModel owner, long id, string pattern, CategoryInfo category, bool isUser, ActivityKind kind,
-    string usage = "") : ObservableObject
+    string usage = "", bool isAi = false) : ObservableObject
 {
     /// <summary>Time spent in the last 30 days in apps/websites this rule matches ("" when none).</summary>
     public string Usage { get; } = usage;
@@ -32,7 +32,7 @@ public sealed partial class RuleRow(RulesViewModel owner, long id, string patter
     public string Pattern { get; } = pattern;
     public ActivityKind Kind { get; } = kind;
     public string KindText => Loc.T(Kind == ActivityKind.Web ? "rules.kindWeb" : "rules.kindApp");
-    public string Source => Loc.T(isUser ? "rules.user" : "rules.default");
+    public string Source => Loc.T(isUser ? "rules.user" : isAi ? "rules.ai" : "rules.default");
     public IReadOnlyList<CategoryInfo> Choices => AppServices.Instance.CategoryList;
 
     [ObservableProperty] private CategoryInfo _category = category;
@@ -129,7 +129,7 @@ public sealed partial class RulesViewModel : PageViewModel
         var limit = ShowAll || q.Length > 0 ? matching.Count : TopCount;
         Rules = matching.Take(limit)
             .Select(r => new RuleRow(this, r.Id, r.Pattern, s.Category(r.CategoryId), r.IsUser, r.Kind,
-                _usage.TryGetValue(r.Id, out var u) && u >= TimeSpan.FromMinutes(1) ? Loc.F("rules.usage", Format.Duration(u)) : ""))
+                _usage.TryGetValue(r.Id, out var u) && u >= TimeSpan.FromMinutes(1) ? Loc.F("rules.usage", Format.Duration(u)) : "", r.IsAi))
             .ToList();
         CanShowMore = q.Length == 0 && matching.Count > TopCount;
         ShowAllText = ShowAll ? Loc.T("rules.showFewer") : Loc.F("rules.showAll", matching.Count);

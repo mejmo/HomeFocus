@@ -54,6 +54,9 @@ public sealed class AppServices : IDisposable
     public BrowserState Browser { get; }
     public PairingTokens Pairing { get; }
     public BrowserBridge? Bridge { get; private set; }
+    public AiService? Ai { get; private set; }
+
+    public void StartAi() => Ai = new AiService(this);
 
     /// <summary>Extension IDs allowed to connect: the unpacked development build and the Chrome Web Store item.</summary>
     public static readonly string[] ExtensionIds = [ExtensionInfo.DevId, ExtensionInfo.StoreId];
@@ -100,6 +103,7 @@ public sealed class AppServices : IDisposable
     public void Dispose()
     {
         Bridge?.Dispose();
+        Ai?.Dispose();
         Tracking.Dispose();
     }
 }
@@ -111,4 +115,9 @@ public static class SettingKeys
     public const string CloseToTray = "close_to_tray";
     public const string Theme = "theme"; // system | light | dark
     public const string FirstRunDone = "first_run_done";
+    public const string HideWebBanner = "hide_web_banner";
+    public const string AiEnabled = "ai_enabled";
+    public const string AiPosition = "ai_position";
+    public const string AiUrl = "ai_url";
+    public const string AiModel = "ai_model";
 }

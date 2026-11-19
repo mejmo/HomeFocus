@@ -23,6 +23,23 @@
             </StackPanel>
         </Grid>
 
+        <!-- Offer the browser extension while no browser is paired -->
+        <Border Style="{StaticResource Card}" Margin="0,0,0,20" Padding="18,14"
+                Visibility="{Binding ShowWebBanner, Converter={StaticResource BoolToVis}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Icon}" Width="32" Height="32" Margin="8,0,0,0"
+                        Command="{Binding DismissWebBannerCommand}" ToolTip="{l:T web.dismiss}" AutomationProperties.Name="{l:T web.dismiss}">
+                    <c:IconView Data="{StaticResource Icon.Close}" Width="14" Height="14"/>
+                </Button>
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Primary}" Content="{l:T web.enable}"
+                        Command="{Binding EnableWebTrackingCommand}" VerticalAlignment="Center"/>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock Text="{l:T web.bannerTitle}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{l:T web.bannerText}" Style="{StaticResource Text.Muted}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
         <!-- KPI tiles -->
         <UniformGrid Columns="4" Margin="-8,0,-8,20">
             <Border Style="{StaticResource Card}" Margin="8,0">

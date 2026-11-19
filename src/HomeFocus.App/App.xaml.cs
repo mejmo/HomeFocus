@@ -54,6 +54,7 @@ public partial class App : Application
         FirstRun();
         _services.Tracking.Start();
         _services.StartBridge(browser => Dispatcher.InvokeAsync(() => ApproveBrowser(browser)).Task);
+        _services.StartAi();
 
         var vm = new MainViewModel();
         _window = new MainWindow(vm);
