@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-dark.png">
     <img src="docs/images/logo-light.png" alt="HomeFocus" width="440">
@@ -17,7 +17,7 @@
 <p align="center"><b>Stay in focus while you work from home.</b><br>
 HomeFocus quietly tracks where your time goes on your Windows PC, so you can see when work turns into scrolling.</p>
 
-![HomeFocus – weekly overview by category and app ranking](docs/images/screenshot.png)
+![HomeFocus – weekly overview by category and app ranking](docs/images/overview.png)
 
 ## Why HomeFocus
 
